@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stratus.Godot", "Stratus.Godot\Stratus.Godot.csproj", "{31C95405-D728-4661-BF23-38640AB80721}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{31C95405-D728-4661-BF23-38640AB80721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31C95405-D728-4661-BF23-38640AB80721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31C95405-D728-4661-BF23-38640AB80721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31C95405-D728-4661-BF23-38640AB80721}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {80257E62-EBBE-48B8-AB52-46F12A7B0D17}
+	EndGlobalSection
+EndGlobal

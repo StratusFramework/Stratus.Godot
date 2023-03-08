@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Stratus.Godot</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GodotSharp" Version="4.0.0" />
+    <PackageReference Include="GodotSharpEditor" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Stratus\Stratus\Stratus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\Input\" />
+  </ItemGroup>
+
+</Project>
