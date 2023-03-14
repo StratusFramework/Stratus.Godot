@@ -35,11 +35,12 @@ namespace Stratus.Godot
 		};
 
 		private Dictionary<string, CompositeActionNames> compositeActionNames
-			= new Dictionary<string, CompositeActionNames>();	
+			= new Dictionary<string, CompositeActionNames>();
 
-		public GodotInputActionMapHandler(string name)
+		public GodotInputActionMapHandler(string name, bool lowercase = true)
 		{
 			this._name = name;
+			this.lowercase = lowercase;
 		}
 
 		public override bool HandleInput(InputEvent input)
@@ -50,8 +51,6 @@ namespace Stratus.Godot
 				{
 					switch (binding.type)
 					{
-						case InputActionType.None:
-							break;
 						case InputActionType.Button:
 							{
 								if (input.IsAction(binding.name))
@@ -61,6 +60,7 @@ namespace Stratus.Godot
 								}
 							}
 							break;
+
 						case InputActionType.Composite:
 							{
 								binding.action(input);
@@ -87,7 +87,7 @@ namespace Stratus.Godot
 			{
 				xNegative = $"{name}{vector2Pattern[0]}",
 				xPositive = $"{name}{vector2Pattern[1]}",
-				yPositive  = $"{name}{vector2Pattern[2]}",
+				yPositive = $"{name}{vector2Pattern[2]}",
 				yNegative = $"{name}{vector2Pattern[3]}"
 			});
 
