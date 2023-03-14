@@ -16,8 +16,4 @@
     <ProjectReference Include="..\..\Stratus\Stratus\Stratus.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="src\Input\" />
-  </ItemGroup>
-
 </Project>

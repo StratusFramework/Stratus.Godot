@@ -6,7 +6,11 @@ using System;
 
 namespace Stratus.Godot
 {
-	public class GodotLogger : StratusLogger
+	/// <summary>
+	/// The logger to use for Godot.
+	/// </summary>
+	/// <remarks>To use, make sure to subclass from it in your main project.</remarks>
+	public abstract class GodotLogger : StratusLogger
 	{
 		public override void LogError(string message)
 		{
