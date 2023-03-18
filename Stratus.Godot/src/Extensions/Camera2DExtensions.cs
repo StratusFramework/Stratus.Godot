@@ -2,7 +2,7 @@
 
 namespace Stratus.Godot.Extensions
 {
-    public static class Camera2DExtensions
+	public static class Camera2DExtensions
     {
 		public static void Limit(this Camera2D camera, TileMap map)
 		{

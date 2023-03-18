@@ -37,6 +37,11 @@ namespace Stratus.Godot
 		private Dictionary<string, CompositeActionNames> compositeActionNames
 			= new Dictionary<string, CompositeActionNames>();
 
+
+		public GodotInputActionMapHandler()
+		{
+		}
+
 		public GodotInputActionMapHandler(string name, bool lowercase = true)
 		{
 			this._name = name;
@@ -118,4 +123,14 @@ namespace Stratus.Godot
 			return false;
 		}
 	}
+
+	public abstract class GodotInputLayer<TAction> : InputLayer<InputEvent, GodotInputActionMapHandler>
+		where TAction : Enum
+	{
+		public override bool HandleInput(InputEvent input)
+		{
+			return map.HandleInput(input);
+		}
+	}
+
 }
