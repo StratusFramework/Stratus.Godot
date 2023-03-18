@@ -124,13 +124,4 @@ namespace Stratus.Godot
 		}
 	}
 
-	public abstract class GodotInputLayer<TAction> : InputLayer<InputEvent, GodotInputActionMapHandler>
-		where TAction : Enum
-	{
-		public override bool HandleInput(InputEvent input)
-		{
-			return map.HandleInput(input);
-		}
-	}
-
 }

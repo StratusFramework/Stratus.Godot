@@ -1,6 +1,6 @@
 ﻿using Godot;
 
-namespace Stratus.Godot
+namespace Stratus.Godot.TileMaps
 {
 	/// <summary>
 	/// A node that works on top of an existing <see cref="TileMap"/>

@@ -11,5 +11,20 @@ namespace Stratus.Godot.Extensions
 		{
 			return node.GetChildren().OfType<TNode>().FirstOrDefault();
 		}
+
+		public static void LogInfo(this Node node, string message)
+		{
+			StratusLog.Info($"[{node.Name}] {message}");
+		}
+
+		public static void LogWarning(this Node node, string message)
+		{
+			StratusLog.Warning($"[{node.Name}] {message}");
+		}
+
+		public static void LogError(this Node node, string message)
+		{
+			StratusLog.Error($"[{node.Name}] {message}");
+		}
 	}
 }
