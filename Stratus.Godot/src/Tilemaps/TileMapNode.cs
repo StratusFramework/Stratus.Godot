@@ -1,24 +1,31 @@
 ﻿using Godot;
 
+using Stratus.Godot.Extensions;
+
+using System;
+
 namespace Stratus.Godot.TileMaps
 {
 	/// <summary>
 	/// A node that works on top of an existing <see cref="TileMap"/>
 	/// </summary>
-	public partial class TileMapNode2D : Node2D
+	public partial class TileMapNode : Node2D
 	{
 		public TileMap tileMap { get; private set; }
 		public bool ready => tileMap != null;
 
+		public Vector2I cellPosition => tileMap.LocalToMap(Position);
+		public event Action<Vector2I> onMoved;
+
 		public override void _Ready()
 		{
-			
 		}
 
 		public void Initialize(TileMap tileMap)
 		{
 			this.tileMap = tileMap;
 			this.Reparent(tileMap);
+			SnapToClosest();
 		}
 
 		public void Disable()
@@ -27,22 +34,32 @@ namespace Stratus.Godot.TileMaps
 			Reparent(null);
 		}
 
-		public void Move(Vector2I direction)
+		public Result<Vector2I> Move(Vector2I direction)
 		{
-			var cellPosition = tileMap.LocalToMap(Position);
-			cellPosition += direction;
-			Snap(cellPosition);
+			var newPosition = cellPosition + direction;
+			bool moved = MoveTo(newPosition);
+			return new Result<Vector2I>(moved,
+				moved ? newPosition : cellPosition);
 		}
 
-		public void Snap(Vector2I position)
+		public void SnapToClosest()
+		{
+			var cellPosition = tileMap.LocalToMap(Position);
+			MoveTo(cellPosition);
+			this.LogInfo($"Snapped {this} to {cellPosition}");
+		}
+
+		public bool MoveTo(Vector2I position)
 		{
 			if (!Contains(position))
 			{
-				return;
+				return false;
 			}
+
+			onMoved?.Invoke(position);
 			var localPos = tileMap.MapToLocal(position);
-			//var worldPos = ToGlobal(localPos);
 			Position = localPos;
+			return true;
 		}
 
 		public bool Contains(Vector2I position)
