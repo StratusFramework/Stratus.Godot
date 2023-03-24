@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\Stratus\Stratus\Stratus.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="src\Models\States\" />
+  </ItemGroup>
+
 </Project>

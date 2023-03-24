@@ -23,12 +23,12 @@ namespace Stratus.Godot.Inputs
 
 		public void Push()
 		{
-			GodotEventSystem.Broadcast(pushEvent);
+			GodotEventSystem.Broadcast(new PushEvent(this));
 		}
 
 		public void Pop()
 		{
-			GodotEventSystem.Broadcast(new PopEvent());
+			GodotEventSystem.Broadcast(new PopEvent(this));
 		}
 	}
 }

@@ -12,9 +12,10 @@ namespace Stratus.Godot.TileMaps
 	public partial class TileMapNode : Node2D
 	{
 		public TileMap tileMap { get; private set; }
-		public bool ready => tileMap != null;
 
+		public bool ready => tileMap != null;
 		public Vector2I cellPosition => tileMap.LocalToMap(Position);
+
 		public event Action<Vector2I> onMoved;
 
 		public override void _Ready()
@@ -46,7 +47,6 @@ namespace Stratus.Godot.TileMaps
 		{
 			var cellPosition = tileMap.LocalToMap(Position);
 			MoveTo(cellPosition);
-			this.LogInfo($"Snapped {this} to {cellPosition}");
 		}
 
 		public bool MoveTo(Vector2I position)

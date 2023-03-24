@@ -1,63 +1,98 @@
 ﻿using Godot;
-using System.Collections.Generic;
+
+using Stratus.Collections;
+using Stratus.Logging;
 using Stratus.Models;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Stratus.Collections;
-using Stratus.Logging;
-using Stratus.Godot.Inputs;
 
 namespace Stratus.Godot.UI
 {
-	public class InputLayeredMenuGenerator : IStratusLogger
+	public class InputLayerButtonNavigator : IStratusLogger
 	{
-		private MenuInputLayer inputLayer = new MenuInputLayer();
-		private List<Button> buttons = new();
-		private ArrayNavigator<Button> menuNavigator;
+		public MenuInputLayer layer { get; } = new MenuInputLayer();
+		protected List<Button> buttons = new();
+		protected ArrayNavigator<Button> menuNavigator = new();
 
-		public Control root { get; }
+		public event Action onCancel;
+
+		public InputLayerButtonNavigator()
+		{
+			menuNavigator.onChanged += (curr, prev) => curr.GrabFocus();
+
+			layer.move = (dir) =>
+			{
+				this.Log($"Moved {dir}");
+				menuNavigator.Navigate(new System.Numerics.Vector2(dir.X, dir.Y));
+			};
+			layer.select = () => menuNavigator.current._Pressed();
+			layer.cancel = onCancel;
+		}
+		
+		public void Set(params Button[] values)
+		{
+			buttons.Clear();
+			buttons.AddRange(values);
+			menuNavigator.Set(buttons);
+		}
+
+		public void Focus()
+		{
+			menuNavigator.current.GrabFocus();
+		}
+
+		protected virtual void Cancel()
+		{
+			onCancel?.Invoke();
+		}
+	}
+
+	public class InputLayeredMenuGenerator : InputLayerButtonNavigator
+	{
 		public Container container { get; }
+		public Control root { get; }
 
 		public event Action onOpen;
 		public event Action onClose;
 
 		public InputLayeredMenuGenerator(Container container, Control root = null)
+			: base()
 		{
 			this.container = container;
 			this.root = root ?? container;
-
-			menuNavigator = new ArrayNavigator<Button>();
-			menuNavigator.onChanged += (curr, prev) => curr.GrabFocus();
-			inputLayer.cancel = Close;
-			inputLayer.select = () => menuNavigator.current._Pressed();
 		}
 
 		public void Open(params LabeledAction[] actions)
 		{
 			this.Log($"Opening {root}");
 
-			buttons.Clear();
-
-			foreach (var action in actions)
+			var actionButtons = actions.Select(action =>
 			{
 				var button = new Button();
-				button.Text = action.label;				
+				button.Text = action.label;
 				button.Pressed += () =>
 				{
 					action.action();
 					Close();
 				};
 				container.AddChild(button);
-				buttons.Add(button);
-			}
+				return button;
+			}).ToArray();
 
-			menuNavigator.Set(buttons);
-			menuNavigator.current.GrabFocus();
+			Set(actionButtons);
 			root.Visible = true;
+			Focus();
 
-			inputLayer.Push();
+			layer.Push();
 			onOpen?.Invoke();
+		}
+
+		protected override void Cancel()
+		{
+			base.Cancel();
+			Close();
 		}
 
 		public void Close()
@@ -66,31 +101,11 @@ namespace Stratus.Godot.UI
 			root.Visible = false;
 			onClose?.Invoke();
 
-			inputLayer.Pop();
+			layer.Pop();
 			foreach (var child in container.GetChildren())
 			{
 				child.QueueFree();
 			}
-		}
-
-	}
-
-	public enum MenuInputAction
-	{
-		Move,
-		Select,
-		Cancel,
-	}
-
-	public class MenuInputLayer : GodotInputLayer<MenuInputAction>
-	{
-		public Action<Vector2I> move;
-		public Action select;
-		public Action cancel;
-
-		protected override void Initialize()
-		{
-			map.TryBindAll<MenuInputAction>();
 		}
 	}
 }

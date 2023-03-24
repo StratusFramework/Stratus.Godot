@@ -32,6 +32,7 @@ namespace Stratus.Godot.Inputs
 			inputLayers.onPush += layer => this.LogInfo($"Input layer <{layer}> was pushed ({inputLayers.count})");
 			inputLayers.onPop += layer => this.LogInfo($"Input layer <{layer}> was popped ({inputLayers.count})");
 			inputLayers.onQueue += layer => this.LogInfo($"Input layer <{layer}> was queued ({inputLayers.count})");
+			this.LogInfo("Ready");
 		}
 
 		public override void _UnhandledInput(InputEvent @event)
@@ -55,6 +56,11 @@ namespace Stratus.Godot.Inputs
 
 		private void OnPopLayerEvent(InputLayer.PopEvent e)
 		{
+			if (e.layer != layer)
+			{
+				return;
+			}
+
 			inputEnabled = false;
 			inputLayers.Pop();
 			this.Invoke(() => inputEnabled = true, transitionDuration);
