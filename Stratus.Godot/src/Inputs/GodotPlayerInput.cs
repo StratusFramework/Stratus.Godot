@@ -2,6 +2,7 @@
 
 using Stratus.Inputs;
 using Stratus.Godot.Extensions;
+using Stratus.Extensions;
 
 namespace Stratus.Godot.Inputs
 {
@@ -12,12 +13,14 @@ namespace Stratus.Godot.Inputs
 		/// <summary>
 		/// The current input layer
 		/// </summary>
-		public InputLayer layer => inputLayers.activeLayer;
-		public bool hasInputLayer => inputLayers.hasActiveLayers;
+		public InputLayer layer => inputLayers.current;
+		public bool hasInputLayer => inputLayers.hasLayers;
 		/// <summary>
 		/// Can be used to toggle input processing
 		/// </summary>
 		public bool inputEnabled { get; set; } = true;
+
+		public double transitionDuration { get; set; } = 0.1;
 		#endregion
 
 		#region Messages
@@ -25,7 +28,10 @@ namespace Stratus.Godot.Inputs
 		{
 			GodotEventSystem.Connect<InputLayer.PushEvent>(OnPushLayerEvent);
 			GodotEventSystem.Connect<InputLayer.PopEvent>(OnPopLayerEvent);
-			inputLayers.onInputLayerChanged += this.OnInputLayerChanged;
+			inputLayers.onLayerToggled += this.OnInputLayerChanged;
+			inputLayers.onPush += layer => this.LogInfo($"Input layer <{layer}> was pushed ({inputLayers.count})");
+			inputLayers.onPop += layer => this.LogInfo($"Input layer <{layer}> was popped ({inputLayers.count})");
+			inputLayers.onQueue += layer => this.LogInfo($"Input layer <{layer}> was queued ({inputLayers.count})");
 		}
 
 		public override void _UnhandledInput(InputEvent @event)
@@ -34,29 +40,29 @@ namespace Stratus.Godot.Inputs
 			{
 				layer.HandleInput(@event);
 			}
-		} 
+		}
 		#endregion
 
 		#region Event Handlers
 		private void OnPushLayerEvent(InputLayer.PushEvent e)
 		{
-			StratusLog.Info($"Pushing input layer {e.layer}");
-			inputLayers.Push(e.layer);
+			var push = inputLayers.Push(e.layer);
+			if (push)
+			{
+				StratusLog.Info($"Pushed input layer <{e.layer}>");
+			}
 		}
 
 		private void OnPopLayerEvent(InputLayer.PopEvent e)
 		{
-			// Pop layers that have been marked as inactive
-			while (inputLayers.canPop)
-			{
-				StratusLog.Info($"Popping input layers");
-				inputLayers.Pop();
-			}
+			inputEnabled = false;
+			inputLayers.Pop();
+			this.Invoke(() => inputEnabled = true, transitionDuration);
 		}
 
 		private void OnInputLayerChanged(InputLayer layer)
 		{
-			StratusLog.Info($"Input layer now {layer}");
+			this.LogInfo($"Input layer <{layer}> is now {(layer.active ? "active" : "inactive")}");
 		}
 		#endregion
 

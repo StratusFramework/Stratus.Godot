@@ -20,5 +20,15 @@ namespace Stratus.Godot.Inputs
 		{
 			return map.HandleInput(input);
 		}
+
+		public void Push()
+		{
+			GodotEventSystem.Broadcast(pushEvent);
+		}
+
+		public void Pop()
+		{
+			GodotEventSystem.Broadcast(new PopEvent());
+		}
 	}
 }

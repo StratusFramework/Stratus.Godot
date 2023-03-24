@@ -1,6 +1,8 @@
 ﻿using Godot;
 
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Stratus.Godot.Extensions
 {
@@ -25,6 +27,11 @@ namespace Stratus.Godot.Extensions
 		public static void LogError(this Node node, string message)
 		{
 			StratusLog.Error($"[{node.Name}] {message}");
+		}
+
+		public static void Invoke(this Node node, Action action, double duration)
+		{
+			node.GetTree().CreateTimer(duration).Timeout += action;
 		}
 	}
 }
