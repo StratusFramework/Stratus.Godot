@@ -39,7 +39,14 @@ namespace Stratus.Godot.Inputs
 		{
 			if (inputEnabled && hasInputLayer)
 			{
-				layer.HandleInput(@event);
+				if (!layer.valid)
+				{
+					this.LogWarning($"Layer {layer} is not in a valid state");
+				}
+				else
+				{
+					layer.HandleInput(@event);
+				}
 			}
 		}
 		#endregion
@@ -47,28 +54,33 @@ namespace Stratus.Godot.Inputs
 		#region Event Handlers
 		private void OnPushLayerEvent(InputLayer.PushEvent e)
 		{
+			DisableInputTemporarily();
 			var push = inputLayers.Push(e.layer);
-			if (push)
-			{
-				StratusLog.Info($"Pushed input layer <{e.layer}>");
-			}
+			StratusLog.Result(push);
 		}
 
 		private void OnPopLayerEvent(InputLayer.PopEvent e)
 		{
 			if (e.layer != layer)
 			{
+				this.LogWarning($"Could not pop layer {e.layer} as it not currently at the top");
 				return;
 			}
 
-			inputEnabled = false;
+			DisableInputTemporarily();
 			inputLayers.Pop();
-			this.Invoke(() => inputEnabled = true, transitionDuration);
 		}
 
 		private void OnInputLayerChanged(InputLayer layer)
 		{
 			this.LogInfo($"Input layer <{layer}> is now {(layer.active ? "active" : "inactive")}");
+		}
+
+		private void DisableInputTemporarily()
+		{
+			inputEnabled = false;
+			this.Invoke(() => inputEnabled = true, transitionDuration);
+
 		}
 		#endregion
 

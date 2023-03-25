@@ -4,31 +4,40 @@ using Stratus.Inputs;
 
 using System;
 
+using static Stratus.Inputs.InputLayer;
+
 namespace Stratus.Godot.Inputs
 {
 	public abstract class GodotInputLayer<TAction> : InputLayer<InputEvent, GodotInputActionMapHandler>
 		where TAction : Enum
 	{
-		public GodotInputLayer() : base(typeof(TAction).Name, new GodotInputActionMapHandler(typeof(TAction).Name))
+		public GodotInputLayer(string name = null) : base(name ?? typeof(TAction).Name, 
+			new GodotInputActionMapHandler(typeof(TAction).Name))
 		{
-			Initialize();
+		}
+	}
+
+	public static class GodotInputLayerExtensions
+	{
+		public static void Push(this InputLayer layer)
+		{
+			GodotEventSystem.Broadcast(new PushEvent(layer));
 		}
 
-		protected abstract void Initialize();
-
-		public override bool HandleInput(InputEvent input)
+		public static void Pop(this InputLayer layer)
 		{
-			return map.HandleInput(input);
+			GodotEventSystem.Broadcast(new PopEvent(layer));
 		}
+	}
 
-		public void Push()
-		{
-			GodotEventSystem.Broadcast(new PushEvent(this));
-		}
-
-		public void Pop()
-		{
-			GodotEventSystem.Broadcast(new PopEvent(this));
-		}
+	public enum GodotInputAction
+	{
+		ui_accept,
+		ui_select,
+		ui_cancel,
+		ui_left,
+		ui_right,
+		ui_up,
+		ui_down
 	}
 }

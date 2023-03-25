@@ -1,6 +1,9 @@
 ﻿using Godot;
 
 using Stratus.Collections;
+using Stratus.Extensions;
+using Stratus.Godot.Inputs;
+using Stratus.Inputs;
 using Stratus.Logging;
 using Stratus.Models;
 
@@ -12,23 +15,24 @@ namespace Stratus.Godot.UI
 {
 	public class InputLayerButtonNavigator : IStratusLogger
 	{
-		public MenuInputLayer layer { get; } = new MenuInputLayer();
+		public MenuInputLayer layer { get; } 
 		protected List<Button> buttons = new();
 		protected ArrayNavigator<Button> menuNavigator = new();
 
 		public event Action onCancel;
 
-		public InputLayerButtonNavigator()
+		public InputLayerButtonNavigator(string name)
 		{
 			menuNavigator.onChanged += (curr, prev) => curr.GrabFocus();
-
-			layer.move = (dir) =>
-			{
-				this.Log($"Moved {dir}");
-				menuNavigator.Navigate(new System.Numerics.Vector2(dir.X, dir.Y));
-			};
-			layer.select = () => menuNavigator.current._Pressed();
-			layer.cancel = onCancel;
+			//layer = new(name);
+			layer = new MenuInputLayer(name);
+			//layer.move = (dir) =>
+			//{
+			//	this.Log($"Moved {dir}");
+			//	menuNavigator.Navigate(new System.Numerics.Vector2(dir.X, dir.Y));
+			//};
+			//layer.select = () => menuNavigator.current._Pressed();
+			layer.cancel = Cancel;
 		}
 		
 		public void Set(params Button[] values)
@@ -58,7 +62,7 @@ namespace Stratus.Godot.UI
 		public event Action onClose;
 
 		public InputLayeredMenuGenerator(Container container, Control root = null)
-			: base()
+			: base(root.Name)
 		{
 			this.container = container;
 			this.root = root ?? container;
@@ -66,7 +70,7 @@ namespace Stratus.Godot.UI
 
 		public void Open(params LabeledAction[] actions)
 		{
-			this.Log($"Opening {root}");
+			this.Log($"Opening Menu at {root}");
 
 			var actionButtons = actions.Select(action =>
 			{
@@ -74,8 +78,8 @@ namespace Stratus.Godot.UI
 				button.Text = action.label;
 				button.Pressed += () =>
 				{
-					action.action();
 					Close();
+					action.action();
 				};
 				container.AddChild(button);
 				return button;
@@ -97,11 +101,12 @@ namespace Stratus.Godot.UI
 
 		public void Close()
 		{
-			this.Log($"Closing {root}");
+			this.Log($"Closing Menu at {root}");
+
 			root.Visible = false;
 			onClose?.Invoke();
-
 			layer.Pop();
+
 			foreach (var child in container.GetChildren())
 			{
 				child.QueueFree();
