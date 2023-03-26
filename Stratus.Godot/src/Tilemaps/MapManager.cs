@@ -3,9 +3,11 @@
 using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
+using Stratus.Models;
+using Stratus.Models.Maps;
 
 namespace Stratus.Godot.TileMaps
-{		
+{
 	public abstract class TileMapEvent : Event
 	{
 		public TileMap tileMap { get; }
@@ -26,7 +28,11 @@ namespace Stratus.Godot.TileMaps
 		}
 	}
 
-	public abstract partial class MapManager : Node2D
+	public interface IMapManager
+	{
+	}
+
+	public abstract partial class MapManager : Node2D, IMapManager
 	{
 		public class LoadEvent : TileMapEvent
 		{
@@ -56,9 +62,14 @@ namespace Stratus.Godot.TileMaps
 		public override void _Ready()
 		{
 			GodotEventSystem.Connect<CursorMovedEvent>(OnCursorMovedEvent);
-			GodotEventSystem.Connect<SelectCursorEvent>(e =>
+			GodotEventSystem.Connect<SelectCursorEvent>(e => SelectAtCursor());
+			GodotEventSystem.Connect<MovementRangeEvent.Request>(e =>
 			{
-				SelectAtCursor();
+				var range = GetRange(e.input);
+				if (range != null)
+				{
+					GodotEventSystem.Broadcast(new MovementRangeEvent.Response(e.input, range));
+				}
 			});
 
 			if (camera == null)
@@ -67,6 +78,7 @@ namespace Stratus.Godot.TileMaps
 			}
 
 			OnReady();
+			GodotEventSystem.Broadcast(new InitializedMapManagerEvent(this));
 		}
 
 		public override void _Process(double delta)
@@ -103,6 +115,18 @@ namespace Stratus.Godot.TileMaps
 			cursor.Disable();
 			inputLayer.Pop();
 			initialized = false;
+		}
+
+		protected virtual GridRange? GetRange(IActor2D actor) => map.GetRange(actor);
+	}
+
+	public class InitializedMapManagerEvent : Event
+	{
+		public IMapManager manager { get; }
+
+		public InitializedMapManagerEvent(IMapManager manager)
+		{
+			this.manager = manager;
 		}
 	}
 

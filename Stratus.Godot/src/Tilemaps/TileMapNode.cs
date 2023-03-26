@@ -1,6 +1,8 @@
 ﻿using Godot;
 
 using Stratus.Godot.Extensions;
+using Stratus.Models.Maps;
+using Stratus.Numerics;
 
 using System;
 
@@ -12,7 +14,6 @@ namespace Stratus.Godot.TileMaps
 	public partial class TileMapNode : Node2D
 	{
 		public TileMap tileMap { get; private set; }
-
 		public bool ready => tileMap != null;
 		public Vector2I cellPosition => tileMap.LocalToMap(Position);
 

@@ -114,7 +114,6 @@ namespace Stratus.Godot
 			Bind(name, (Vector2 value) => action(new Vector2I((int)value.X, -(int)value.Y)));
 		}
 
-
 		public override bool TryBind(string name, object deleg)
 		{
 			if (deleg is Action action)

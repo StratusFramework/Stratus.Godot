@@ -2,14 +2,11 @@
 
 using Stratus.Events;
 using Stratus.Godot.Extensions;
+using Stratus.Models;
 using Stratus.Models.Maps;
 using Stratus.Numerics;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Stratus.Godot.TileMaps
 {
@@ -17,6 +14,8 @@ namespace Stratus.Godot.TileMaps
 	{
 		[Export]
 		public TileMap tileMap;
+
+		public abstract GridRange GetRange(IActor2D actor);
 	}
 
 	public abstract partial class Map<TLayer> : Map
@@ -63,6 +62,11 @@ namespace Stratus.Godot.TileMaps
 
 	public abstract partial class DefaultMap : Map<DefaultMapLayer>
 	{
+		public override GridRange GetRange(IActor2D actor)
+		{
+			return grid.GetRange(DefaultMapLayer.Actor,
+				(Node2D)actor, 5);
+		}
 	}
 
 	public class TileMapLoadEvent : Event

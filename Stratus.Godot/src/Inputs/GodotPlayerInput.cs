@@ -28,9 +28,9 @@ namespace Stratus.Godot.Inputs
 		{
 			GodotEventSystem.Connect<InputLayer.PushEvent>(OnPushLayerEvent);
 			GodotEventSystem.Connect<InputLayer.PopEvent>(OnPopLayerEvent);
-			inputLayers.onLayerToggled += this.OnInputLayerChanged;
-			inputLayers.onPush += layer => this.LogInfo($"Input layer <{layer}> was pushed ({inputLayers.count})");
-			inputLayers.onPop += layer => this.LogInfo($"Input layer <{layer}> was popped ({inputLayers.count})");
+			//inputLayers.onLayerToggled += this.OnInputLayerChanged;
+			//inputLayers.onPush += layer => this.LogInfo($"Input layer <{layer}> was pushed ({inputLayers.count})");
+			//inputLayers.onPop += layer => this.LogInfo($"Input layer <{layer}> was popped ({inputLayers.count})");
 			inputLayers.onQueue += layer => this.LogInfo($"Input layer <{layer}> was queued ({inputLayers.count})");
 			this.LogInfo("Ready");
 		}
@@ -41,7 +41,7 @@ namespace Stratus.Godot.Inputs
 			{
 				if (!layer.valid)
 				{
-					this.LogWarning($"Layer {layer} is not in a valid state");
+					this.LogWarning($"Layer <{layer}> is not in a valid state");
 				}
 				else
 				{
@@ -63,7 +63,7 @@ namespace Stratus.Godot.Inputs
 		{
 			if (e.layer != layer)
 			{
-				this.LogWarning($"Could not pop layer {e.layer} as it not currently at the top");
+				this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
 				return;
 			}
 
@@ -71,10 +71,10 @@ namespace Stratus.Godot.Inputs
 			inputLayers.Pop();
 		}
 
-		private void OnInputLayerChanged(InputLayer layer)
-		{
-			this.LogInfo($"Input layer <{layer}> is now {(layer.active ? "active" : "inactive")}");
-		}
+		//private void OnInputLayerChanged(InputLayer layer)
+		//{
+		//	this.LogInfo($"Input layer <{layer}> is now {(layer.active ? "active" : "inactive")}");
+		//}
 
 		private void DisableInputTemporarily()
 		{
