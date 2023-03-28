@@ -41,17 +41,17 @@ namespace Stratus.Godot.TileMaps
 		{
 			this.LogInfo($"Initializing {tileMap}");
 			var rect = tileMap.GetUsedRect();
-			grid = new Grid2D<Node2D, TLayer>(new Vector3Int(rect.Size.X, rect.Size.Y), CellLayout.Rectangle);
+			grid = new Grid2D<Node2D, TLayer>(new Vector2Int(rect.Size.X, rect.Size.Y), CellLayout.Rectangle);
 		}
 
 		public TNode? Get<TNode>(Vector2I position, TLayer layer) where TNode : Node2D 
 		{
-			return grid.Get<TNode>(layer, position.ToVector3Int());
+			return grid.Get<TNode>(layer, position.ToVector2Int());
 		}
 
 		public bool TryGet<TNode>(Vector2I position, TLayer layer, out TNode? obj) where TNode : Node2D
 		{
-			obj = grid.Get<TNode>(layer, position.ToVector3Int());
+			obj = grid.Get<TNode>(layer, position.ToVector2Int());
 			if (obj == null)
 			{
 				return false;
