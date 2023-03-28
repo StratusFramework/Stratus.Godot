@@ -30,16 +30,21 @@ namespace Stratus.Godot.TileMaps
 
 	public interface IMapManager
 	{
+		TileMap? tileMap { get; }
 	}
 
 	public abstract partial class MapManager : Node2D, IMapManager
 	{
+		public abstract TileMap? tileMap { get; }
+
 		public class LoadEvent : TileMapEvent
 		{
 			public LoadEvent(TileMap tileMap) : base(tileMap)
 			{
 			}
 		}
+
+		public override string ToString() => Name;
 	}
 
 	public abstract partial class MapManager<TMap> : MapManager
@@ -48,7 +53,9 @@ namespace Stratus.Godot.TileMaps
 		public abstract Cursor2D cursor { get; }
 		public abstract Camera2D camera { get; }
 		public TMap map { get; protected set; }
+		public override TileMap? tileMap => map != null ? map.tileMap : null;
 		public bool initialized { get; private set; }
+
 
 		private MapInputLayer inputLayer = new MapInputLayer();
 
@@ -77,6 +84,11 @@ namespace Stratus.Godot.TileMaps
 				StratusLog.Error("No camera has been set");
 			}
 
+			foreach(var gizmo in this.GetChildrenOfType<TileMapGizmo>())
+			{
+				gizmo.Initialize(this);
+			}
+
 			OnReady();
 			GodotEventSystem.Broadcast(new InitializedMapManagerEvent(this));
 		}
@@ -87,6 +99,7 @@ namespace Stratus.Godot.TileMaps
 		}
 		#endregion
 
+		#region Loading
 		public void Load()
 		{
 			Load(map ?? this.GetChildOfType<TMap>());
@@ -116,8 +129,23 @@ namespace Stratus.Godot.TileMaps
 			inputLayer.Pop();
 			initialized = false;
 		}
+		#endregion
 
-		protected virtual GridRange? GetRange(IActor2D actor) => map.GetRange(actor);
+		#region Interface
+		//public bool MoveTo(Vector2I position)
+		//{
+		//	if (!Contains(position))
+		//	{
+		//		return false;
+		//	}
+
+		//	var localPos = tileMap.MapToLocal(position);
+		//	Position = localPos;
+		//	return true;
+		//}
+
+		protected virtual GridRange? GetRange(IActor2D actor) => map.GetRange(actor); 
+		#endregion
 	}
 
 	public class InitializedMapManagerEvent : Event

@@ -9,7 +9,7 @@ namespace Stratus.Godot.TileMaps
 	public abstract partial class TileMapGizmo : Node2D
 	{
 		private MenuInputLayer input;
-		public TileMap tileMap { get; private set; }
+		public MapManager map { get; private set; }
 
 		protected abstract void Move(Vector2I input);
 		protected abstract void OnConfirm();
@@ -22,16 +22,12 @@ namespace Stratus.Godot.TileMaps
 			input.move += Move;
 			input.select += Confirm;
 			input.cancel += Cancel;
-
-			this.Connect<MapManager.LoadEvent>(e =>
-			{
-				Initialize(e.tileMap);
-			});
 		}
 
-		public void Initialize(TileMap tileMap)
+		public void Initialize(MapManager manager)
 		{
-			this.tileMap = tileMap;
+			this.LogInfo($"Initialized by {manager}");
+			this.map = manager;
 		}
 
 		protected void ShowGizmo()

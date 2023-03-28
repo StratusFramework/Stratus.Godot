@@ -1,6 +1,7 @@
 ﻿using Godot;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Stratus.Godot.Extensions
@@ -11,6 +12,12 @@ namespace Stratus.Godot.Extensions
 			where TNode : Node
 		{
 			return node.GetChildren().OfType<TNode>().FirstOrDefault();
+		}
+
+		public static IEnumerable<TNode> GetChildrenOfType<TNode>(this Node node)
+			where TNode : Node
+		{
+			return node.GetChildren().OfType<TNode>();
 		}
 
 		public static void LogInfo(this Node node, string message)
