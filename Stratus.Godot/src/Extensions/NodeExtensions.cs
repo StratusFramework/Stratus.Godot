@@ -1,10 +1,7 @@
 ﻿using Godot;
 
-using Stratus.Events;
-
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Stratus.Godot.Extensions
 {

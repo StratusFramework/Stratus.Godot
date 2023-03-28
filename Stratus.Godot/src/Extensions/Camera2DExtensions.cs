@@ -22,12 +22,4 @@ namespace Stratus.Godot.Extensions
 			return $"X({camera.LimitLeft}, {camera.LimitRight}), Y({camera.LimitBottom}, {camera.LimitTop})";
 		}
 	}
-
-	public static class VectorExtensions
-	{
-		public static Vector3Int ToVector3Int(this Vector2I value)
-		{
-			return new Vector3Int(value.X, value.Y);
-		}
-	}
 }
