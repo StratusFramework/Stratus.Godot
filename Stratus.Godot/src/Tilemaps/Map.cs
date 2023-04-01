@@ -20,49 +20,15 @@ namespace Stratus.Godot.TileMaps
 		public abstract GridRange GetRange(IActor2D actor);
 	}
 
-	public class TileInfo : IEquatable<TileInfo>
+	public class TileInfo : CellReference<Node2D, TileData>
 	{
-		public TileInfo(TileData data, Vector2I position)
+		public TileInfo(Node2D node) : base(node)
 		{
-			this.data = data;
-			this.position = position;
 		}
 
-		public TileInfo(Node2D node)
+		public TileInfo(TileData data, Vector2Int position) 
+			: base(data, position)
 		{
-			this.node = node;
-		}
-
-		/// <summary>
-		/// For active objects on a tile
-		/// </summary>
-		public Node2D node { get; }
-		/// <summary>
-		/// For static tiles (painted from a tileset)
-		/// </summary>
-		public TileData data { get; }
-		/// <summary>
-		/// Used in conjuntion with <see cref="data"/> to differentiate
-		/// since data is shared among all tiles of a given type
-		/// </summary>
-		public Vector2I position { get; }
-
-		public bool Equals(TileInfo? other)
-		{
-			return this.node == other.node && this.data == other.data
-				&& this.position == other.position;
-		}
-
-		public override bool Equals(object? obj) => Equals(obj as TileInfo);
-
-		public override int GetHashCode()
-		{
-			return node?.GetHashCode() ?? data.GetHashCode();
-		}
-
-		public override string ToString()
-		{
-			return node != null ? node.ToString() : data.ToString();
 		}
 	}
 
@@ -101,7 +67,8 @@ namespace Stratus.Godot.TileMaps
 				foreach (var pos in positions)
 				{
 					TileData data = tileMap.GetCellTileData(l, pos);
-					var result = grid.Set(layer, new TileInfo(data, pos), pos.ToVector2Int());
+					var _pos = pos.ToVector2Int();
+					var result = grid.Set(layer, new TileInfo(data, _pos), _pos);
 					if (!result)
 					{
 						StratusLog.Result(result);

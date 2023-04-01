@@ -103,7 +103,6 @@ namespace Stratus.Godot.TileMaps
 			}
 
 			OnReady();
-			GodotEventSystem.Broadcast(new InitializedMapManagerEvent(this));
 		}
 
 		public override void _Process(double delta)
@@ -147,16 +146,6 @@ namespace Stratus.Godot.TileMaps
 		#region Interface
 		protected virtual GridRange? GetRange(IActor2D actor) => map.GetRange(actor); 
 		#endregion
-	}
-
-	public class InitializedMapManagerEvent : Event
-	{
-		public IMapManager manager { get; }
-
-		public InitializedMapManagerEvent(IMapManager manager)
-		{
-			this.manager = manager;
-		}
 	}
 
 	public enum MapInputAction
