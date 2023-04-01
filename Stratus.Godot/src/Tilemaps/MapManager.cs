@@ -97,7 +97,7 @@ namespace Stratus.Godot.TileMaps
 				StratusLog.Error("No camera has been set");
 			}
 
-			foreach(var gizmo in this.GetChildrenOfType<MapNode>())
+			foreach (var gizmo in this.GetChildrenOfType<MapNode>())
 			{
 				gizmo.Initialize(this);
 			}
@@ -144,7 +144,8 @@ namespace Stratus.Godot.TileMaps
 		#endregion
 
 		#region Interface
-		protected virtual GridRange? GetRange(IActor2D actor) => map.GetRange(actor); 
+		protected virtual GridRange? GetRange(IActor2D actor) => map.map.GetRange(actor);
+		protected virtual GridRange? GetPath(IActor2D actor, Vector2I position) => map.map.GetRange(actor);
 		#endregion
 	}
 
