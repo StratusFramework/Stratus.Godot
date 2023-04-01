@@ -31,11 +31,13 @@ namespace Stratus.Godot.TileMaps
 	public interface IMapManager
 	{
 		TileMap? tileMap { get; }
+		Vector2I cursorPosition { get; }
 	}
 
 	public abstract partial class MapManager : Node2D, IMapManager
 	{
 		public abstract TileMap? tileMap { get; }
+		public abstract Vector2I cursorPosition { get; }
 
 		public class LoadEvent : TileMapEvent
 		{
@@ -55,6 +57,7 @@ namespace Stratus.Godot.TileMaps
 		public TMap map { get; protected set; }
 		public override TileMap? tileMap => map != null ? map.tileMap : null;
 		public bool initialized { get; private set; }
+		public override Vector2I cursorPosition => cursor.cellPosition;
 
 
 		private MapInputLayer inputLayer = new MapInputLayer();
@@ -68,7 +71,13 @@ namespace Stratus.Godot.TileMaps
 		#region Engine
 		public override void _Ready()
 		{
-			GodotEventSystem.Connect<CursorMovedEvent>(OnCursorMovedEvent);
+			GodotEventSystem.Connect<CursorMovedEvent>(e =>
+			{
+				if (inputLayer.active)
+				{
+					OnCursorMovedEvent(e);
+				}
+			});
 			GodotEventSystem.Connect<SelectCursorEvent>(e => SelectAtCursor());
 			GodotEventSystem.Connect<MovementRangeEvent.Request>(e =>
 			{
@@ -88,7 +97,7 @@ namespace Stratus.Godot.TileMaps
 				StratusLog.Error("No camera has been set");
 			}
 
-			foreach(var gizmo in this.GetChildrenOfType<TileMapGizmo>())
+			foreach(var gizmo in this.GetChildrenOfType<MapNode>())
 			{
 				gizmo.Initialize(this);
 			}
@@ -168,6 +177,7 @@ namespace Stratus.Godot.TileMaps
 				var dir = new Vector2I((int)value.X, -(int)value.Y);
 				GodotEventSystem.Broadcast(new MoveCursorEvent(dir));
 			});
+
 			map.Bind(MapInputAction.Select, () =>
 			{
 				GodotEventSystem.Broadcast(new SelectCursorEvent());

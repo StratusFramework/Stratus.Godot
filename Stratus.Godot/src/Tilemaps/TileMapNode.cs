@@ -17,7 +17,7 @@ namespace Stratus.Godot.TileMaps
 		public bool ready => tileMap != null;
 		public Vector2I cellPosition => tileMap.LocalToMap(Position);
 
-		public event Action<Vector2I> onMoved;
+		public event Action<Vector2Int> onMoved;
 
 		public override void _Ready()
 		{
@@ -39,9 +39,8 @@ namespace Stratus.Godot.TileMaps
 		public Result<Vector2I> Move(Vector2I direction)
 		{
 			var newPosition = cellPosition + direction;
-			bool moved = MoveTo(newPosition);
-			return new Result<Vector2I>(moved,
-				moved ? newPosition : cellPosition);
+			var moved = MoveTo(newPosition);
+			return moved;
 		}
 
 		public void SnapToClosest()
@@ -50,17 +49,17 @@ namespace Stratus.Godot.TileMaps
 			MoveTo(cellPosition);
 		}
 
-		public bool MoveTo(Vector2I position)
+		public Result<Vector2I> MoveTo(Vector2I position)
 		{
 			if (!Contains(position))
 			{
-				return false;
+				return new Result<Vector2I>(false, cellPosition, $"Cannot move to position {position} as it does not exist");
 			}
 
-			onMoved?.Invoke(position);
+			onMoved?.Invoke(position.ToVector2Int());
 			var localPos = tileMap.MapToLocal(position);
 			Position = localPos;
-			return true;
+			return new Result<Vector2I>(true, position);
 		}
 
 		public bool Contains(Vector2I position)

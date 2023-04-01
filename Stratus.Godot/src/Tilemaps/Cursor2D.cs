@@ -1,6 +1,8 @@
 using Godot;
 
 using Stratus.Events;
+using Stratus.Godot.Extensions;
+using Stratus.Models;
 
 namespace Stratus.Godot.TileMaps
 {
@@ -10,23 +12,57 @@ namespace Stratus.Godot.TileMaps
 		{
 			GodotEventSystem.Connect<MoveCursorEvent>(e =>
 			{
-				var move = Move(e.direction);
-				if (move)
+				if (e.range != null)
 				{
-					GodotEventSystem.Broadcast(new CursorMovedEvent(move));
+					var next = cellPosition + e.direction;
+					if (!e.range.ContainsKey(next.ToVector2Int()))
+					{
+						return;
+					}
+					else
+					{
+						this.LogInfo($"Can move to {next}");
+					}
 				}
+
+				var move = Move(e.direction);
+				OnMoved(move);
 			});
+
+			GodotEventSystem.Connect<SetCursorPositionEvent>(e =>
+			{
+				var move = MoveTo(e.position);
+				OnMoved(move);
+			});
+		}
+
+		private static void OnMoved(Result<Vector2I> move)
+		{
+			if (move)
+			{
+				GodotEventSystem.Broadcast(new CursorMovedEvent(move));
+			}
+			else
+			{
+				StratusLog.Result(move);
+			}
 		}
 	}
 
 	public class MoveCursorEvent : Event
 	{
+		public Vector2I direction { get; }
+		public GridRange range { get; }
+
 		public MoveCursorEvent(Vector2I direction)
 		{
 			this.direction = direction;
 		}
 
-		public Vector2I direction { get; }
+		public MoveCursorEvent(Vector2I direction, GridRange range) : this(direction)
+		{
+			this.range = range;
+		}
 	}
 
 	public class CursorMovedEvent : Event
@@ -47,6 +83,20 @@ namespace Stratus.Godot.TileMaps
 	}
 
 	public class TileSelectedEvent : Event
+	{
+	}
+
+	public class SetCursorPositionEvent : Event
+	{
+		public SetCursorPositionEvent(Vector2I position)
+		{
+			this.position = position;
+		}
+
+		public Vector2I position { get; }
+	}
+
+	public class ResetCursorPositionEvent : Event
 	{
 	}
 }

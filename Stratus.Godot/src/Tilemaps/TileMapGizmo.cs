@@ -6,10 +6,20 @@ using Stratus.Godot.UI;
 
 namespace Stratus.Godot.TileMaps
 {
-	public abstract partial class TileMapGizmo : Node2D
+	public abstract partial class MapNode : Node2D
 	{
-		private MenuInputLayer input;
 		public MapManager map { get; private set; }
+
+		public void Initialize(MapManager manager)
+		{
+			this.LogInfo($"Initialized by {manager}");
+			this.map = manager;
+		}
+	}
+
+	public abstract partial class TileMapGizmo : MapNode
+	{
+		private MenuInputLayer input;		
 
 		protected abstract void Move(Vector2I input);
 		protected abstract void OnConfirm();
@@ -18,16 +28,9 @@ namespace Stratus.Godot.TileMaps
 		public override void _Ready()
 		{
 			input = new MenuInputLayer(Name);
-
 			input.move += Move;
 			input.select += Confirm;
 			input.cancel += Cancel;
-		}
-
-		public void Initialize(MapManager manager)
-		{
-			this.LogInfo($"Initialized by {manager}");
-			this.map = manager;
 		}
 
 		protected void ShowGizmo()
