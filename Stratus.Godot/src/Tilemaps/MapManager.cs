@@ -32,12 +32,14 @@ namespace Stratus.Godot.TileMaps
 	{
 		TileMap? tileMap { get; }
 		Vector2I cursorPosition { get; }
+		IMap2D map { get; }
 	}
 
 	public abstract partial class MapManager : Node2D, IMapManager
 	{
 		public abstract TileMap? tileMap { get; }
 		public abstract Vector2I cursorPosition { get; }
+		public abstract IMap2D map { get; }
 
 		public class LoadEvent : TileMapEvent
 		{
@@ -54,8 +56,9 @@ namespace Stratus.Godot.TileMaps
 	{
 		public abstract Cursor2D cursor { get; }
 		public abstract Camera2D camera { get; }
-		public TMap map { get; protected set; }
-		public override TileMap? tileMap => map != null ? map.tileMap : null;
+		public TMap mapNode { get; protected set; }
+		public override IMap2D map => mapNode.map;
+		public override TileMap? tileMap => mapNode != null ? mapNode.tileMap : null;
 		public bool initialized { get; private set; }
 		public override Vector2I cursorPosition => cursor.cellPosition;
 
@@ -81,7 +84,7 @@ namespace Stratus.Godot.TileMaps
 			GodotEventSystem.Connect<SelectCursorEvent>(e => SelectAtCursor());
 			GodotEventSystem.Connect<MovementRangeEvent.Request>(e =>
 			{
-				var range = GetRange(e.input);
+				var range = map.GetRange(e.input);
 				if (range != null)
 				{
 					GodotEventSystem.Broadcast(new MovementRangeEvent.Response(e.input, range));
@@ -114,7 +117,7 @@ namespace Stratus.Godot.TileMaps
 		#region Loading
 		public void Load()
 		{
-			Load(map ?? this.GetChildOfType<TMap>());
+			Load(mapNode ?? this.GetChildOfType<TMap>());
 		}
 
 		public void Load(TMap map)
@@ -126,7 +129,7 @@ namespace Stratus.Godot.TileMaps
 			}
 
 			this.LogInfo($"Loading the map {map}");
-			this.map = map;
+			this.mapNode = map;
 			cursor.Initialize(map.tileMap);
 			cursor.MoveTo(Vector2I.Zero);
 			inputLayer.Push();
@@ -141,11 +144,6 @@ namespace Stratus.Godot.TileMaps
 			inputLayer.Pop();
 			initialized = false;
 		}
-		#endregion
-
-		#region Interface
-		protected virtual GridRange? GetRange(IActor2D actor) => map.map.GetRange(actor);
-		protected virtual GridRange? GetPath(IActor2D actor, Vector2I position) => map.map.GetRange(actor);
 		#endregion
 	}
 

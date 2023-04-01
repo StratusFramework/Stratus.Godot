@@ -19,10 +19,6 @@ namespace Stratus.Godot.TileMaps
 					{
 						return;
 					}
-					else
-					{
-						this.LogInfo($"Can move to {next}");
-					}
 				}
 
 				var move = Move(e.direction);
@@ -80,11 +76,7 @@ namespace Stratus.Godot.TileMaps
 		public SelectCursorEvent()
 		{
 		}
-	}
-
-	public class TileSelectedEvent : Event
-	{
-	}
+	}	
 
 	public class SetCursorPositionEvent : Event
 	{
@@ -94,9 +86,5 @@ namespace Stratus.Godot.TileMaps
 		}
 
 		public Vector2I position { get; }
-	}
-
-	public class ResetCursorPositionEvent : Event
-	{
 	}
 }

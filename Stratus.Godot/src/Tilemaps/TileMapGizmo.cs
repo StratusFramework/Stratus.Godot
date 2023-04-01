@@ -19,7 +19,9 @@ namespace Stratus.Godot.TileMaps
 
 	public abstract partial class TileMapGizmo : MapNode
 	{
-		private MenuInputLayer input;		
+		private MenuInputLayer input;
+
+		public bool active { get; private set; }
 
 		protected abstract void Move(Vector2I input);
 		protected abstract void OnConfirm();
@@ -38,6 +40,7 @@ namespace Stratus.Godot.TileMaps
 			this.LogInfo("Showing");
 			input.Push();
 			Visible = true;
+			active = true;
 		}
 
 		protected void HideGizmo()
@@ -45,6 +48,7 @@ namespace Stratus.Godot.TileMaps
 			this.LogInfo("Hiding");
 			input.Pop();
 			Visible = false;
+			active = false;
 		}
 
 		public void Confirm()
