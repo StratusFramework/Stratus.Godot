@@ -77,6 +77,10 @@ namespace Stratus.Godot.TileMaps
 				{
 					GodotEventSystem.Broadcast(new MovementRangeEvent.Response(e.input, range));
 				}
+				else
+				{
+					this.LogError($"Could not find the range for {e.input}");
+				}
 			});
 
 			if (camera == null)
@@ -132,18 +136,6 @@ namespace Stratus.Godot.TileMaps
 		#endregion
 
 		#region Interface
-		//public bool MoveTo(Vector2I position)
-		//{
-		//	if (!Contains(position))
-		//	{
-		//		return false;
-		//	}
-
-		//	var localPos = tileMap.MapToLocal(position);
-		//	Position = localPos;
-		//	return true;
-		//}
-
 		protected virtual GridRange? GetRange(IActor2D actor) => map.GetRange(actor); 
 		#endregion
 	}
