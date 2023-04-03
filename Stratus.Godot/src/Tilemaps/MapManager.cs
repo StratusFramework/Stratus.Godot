@@ -5,6 +5,7 @@ using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
 using Stratus.Models;
 using Stratus.Models.Maps;
+using Stratus.Models.Maps.Actions;
 
 namespace Stratus.Godot.TileMaps
 {
@@ -163,7 +164,7 @@ namespace Stratus.Godot.TileMaps
 			map.Bind(MapInputAction.Move, value =>
 			{
 				var dir = new Vector2I((int)value.X, -(int)value.Y);
-				GodotEventSystem.Broadcast(new MoveCursorEvent(dir));
+				GodotEventSystem.Broadcast(new MoveCursorEvent(dir.ToVector2Int()));
 			});
 
 			map.Bind(MapInputAction.Select, () =>

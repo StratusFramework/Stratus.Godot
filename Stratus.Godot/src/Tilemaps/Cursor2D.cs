@@ -3,6 +3,8 @@ using Godot;
 using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Models;
+using Stratus.Models.Maps;
+using Stratus.Numerics;
 
 namespace Stratus.Godot.TileMaps
 {
@@ -14,20 +16,20 @@ namespace Stratus.Godot.TileMaps
 			{
 				if (e.range != null)
 				{
-					var next = cellPosition + e.direction;
+					var next = cellPosition + e.direction.ToVector2I();
 					if (!e.range.ContainsKey(next.ToVector2Int()))
 					{
 						return;
 					}
 				}
 
-				var move = Move(e.direction);
+				var move = Move(e.direction.ToVector2I());
 				OnMoved(move);
 			});
 
-			GodotEventSystem.Connect<SetCursorPositionEvent>(e =>
+			GodotEventSystem.Connect<SetCursorEvent>(e =>
 			{
-				var move = MoveTo(e.position);
+				var move = MoveTo(e.position.ToVector2I());
 				OnMoved(move);
 			});
 		}
@@ -36,7 +38,7 @@ namespace Stratus.Godot.TileMaps
 		{
 			if (move)
 			{
-				GodotEventSystem.Broadcast(new CursorMovedEvent(move));
+				GodotEventSystem.Broadcast(new CursorMovedEvent(move.result.ToVector2Int()));
 			}
 			else
 			{
@@ -45,46 +47,5 @@ namespace Stratus.Godot.TileMaps
 		}
 	}
 
-	public class MoveCursorEvent : Event
-	{
-		public Vector2I direction { get; }
-		public GridRange range { get; }
-
-		public MoveCursorEvent(Vector2I direction)
-		{
-			this.direction = direction;
-		}
-
-		public MoveCursorEvent(Vector2I direction, GridRange range) : this(direction)
-		{
-			this.range = range;
-		}
-	}
-
-	public class CursorMovedEvent : Event
-	{
-		public Vector2I position { get; }
-
-		public CursorMovedEvent(Vector2I position)
-		{
-			this.position = position;
-		}
-	}
-
-	public class SelectCursorEvent : Event
-	{
-		public SelectCursorEvent()
-		{
-		}
-	}	
-
-	public class SetCursorPositionEvent : Event
-	{
-		public SetCursorPositionEvent(Vector2I position)
-		{
-			this.position = position;
-		}
-
-		public Vector2I position { get; }
-	}
+	
 }
