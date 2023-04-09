@@ -1,13 +1,9 @@
 ﻿using Godot;
 
-using Stratus.Data;
 using Stratus.Godot.Extensions;
-using Stratus.Godot.TileMaps;
 using Stratus.Models.Maps;
 using Stratus.Numerics;
 using Stratus.Utilities;
-
-using System.Xml.Linq;
 
 namespace Stratus.Godot.Tilemaps
 {
@@ -34,7 +30,7 @@ namespace Stratus.Godot.Tilemaps
 				{
 					TileData data = tileMap.GetCellTileData(l, pos);
 					var _pos = pos.ToVector2Int();
-					var result = grid.Set(layer, new TileInfo(data, _pos), _pos);
+					var result = grid.Set(layer, new Object2D(data.ToString(), _pos), _pos);
 					if (!result)
 					{
 						StratusLog.Result(result);
@@ -44,35 +40,5 @@ namespace Stratus.Godot.Tilemaps
 
 			return grid;
 		}
-	}
-
-	public class TileInfo : CellReference<IObject2D, TileData>
-	{
-		public TileInfo(ValueProvider<IObject2D> provider) : base(provider)
-		{
-		}
-
-		public TileInfo(TileData data, Vector2Int position)
-			: base(data, position)
-		{
-		}
-	}
-
-	public class GodotTileMapReference : TileMapReference<TileMap>
-	{
-		public GodotTileMapReference(TileMap tileMap) : base(tileMap)
-		{
-		}
-
-		public override Vector2Int size
-		{
-			get
-			{
-				var rect = tileMap.GetUsedRect();
-				return new Vector2Int(rect.Size.X, rect.Size.Y);
-			}
-		}
-
-		public override int layerCount => tileMap.GetLayersCount();
 	}
 }
