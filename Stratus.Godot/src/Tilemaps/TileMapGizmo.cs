@@ -12,7 +12,7 @@ namespace Stratus.Godot.TileMaps
 
 		public void Initialize(MapManager manager)
 		{
-			this.LogInfo($"Initialized by {manager}");
+			this.Log($"Initialized by {manager}");
 			this.map = manager;
 		}
 	}
@@ -37,7 +37,7 @@ namespace Stratus.Godot.TileMaps
 
 		protected void ShowGizmo()
 		{
-			this.LogInfo("Showing");
+			this.Log("Showing");
 			input.Push();
 			Visible = true;
 			active = true;
@@ -45,7 +45,7 @@ namespace Stratus.Godot.TileMaps
 
 		protected void HideGizmo()
 		{
-			this.LogInfo("Hiding");
+			this.Log("Hiding");
 			input.Pop();
 			Visible = false;
 			active = false;
@@ -53,14 +53,14 @@ namespace Stratus.Godot.TileMaps
 
 		public void Confirm()
 		{
-			this.LogInfo("Confirm");
+			this.Log("Confirm");
 			OnConfirm();
 			HideGizmo();
 		}
 
 		public void Cancel()
 		{
-			this.LogInfo("Cancel");
+			this.Log("Cancel");
 			OnCancel();
 			HideGizmo();
 		}

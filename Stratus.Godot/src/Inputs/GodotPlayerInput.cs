@@ -31,8 +31,8 @@ namespace Stratus.Godot.Inputs
 			//inputLayers.onLayerToggled += this.OnInputLayerChanged;
 			//inputLayers.onPush += layer => this.LogInfo($"Input layer <{layer}> was pushed ({inputLayers.count})");
 			//inputLayers.onPop += layer => this.LogInfo($"Input layer <{layer}> was popped ({inputLayers.count})");
-			inputLayers.onQueue += layer => this.LogInfo($"Input layer <{layer}> was queued ({inputLayers.count})");
-			this.LogInfo("Ready");
+			inputLayers.onQueue += layer => this.Log($"Input layer <{layer}> was queued ({inputLayers.count})");
+			this.Log("Ready");
 		}
 
 		public override void _UnhandledInput(InputEvent @event)

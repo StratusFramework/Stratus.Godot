@@ -1,32 +1,29 @@
 ﻿using Godot;
 
+using Stratus.Data;
 using Stratus.Godot.Extensions;
 using Stratus.Godot.TileMaps;
 using Stratus.Models.Maps;
 using Stratus.Numerics;
-using Stratus.Search;
 using Stratus.Utilities;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Stratus.Godot.Tilemaps
 {
-	public class GodotMap : Map2D<TileMap, TileMapNode, TileData>
+	public class GodotMap : Map2D<TileData>
 	{
-		public GodotMap(TileMap tileMap) : base(tileMap)
+		public GodotMap(TileMap tileMap) : base(() => Generate(tileMap))
 		{
 		}
 
-		public override void Initialize()
+		private static Grid Generate(TileMap tileMap)
 		{
 			var rect = tileMap.GetUsedRect();
 			var size = new Vector2Int(rect.Size.X, rect.Size.Y);
-			_grid = new Grid2D<CellReference<TileMapNode, TileData>, DefaultMapLayer>(size, CellLayout.Rectangle);
+			var grid = new Grid(size, CellLayout.Rectangle);
 
+			// Set the terrain, wall and object? layers
 			var layerCount = tileMap.GetLayersCount();
 			for (int l = 0; l < layerCount; l++)
 			{
@@ -37,19 +34,21 @@ namespace Stratus.Godot.Tilemaps
 				{
 					TileData data = tileMap.GetCellTileData(l, pos);
 					var _pos = pos.ToVector2Int();
-					var result = _grid.Set(layer, new TileInfo(data, _pos), _pos);
+					var result = grid.Set(layer, new TileInfo(data, _pos), _pos);
 					if (!result)
 					{
 						StratusLog.Result(result);
 					}
 				}
 			}
+
+			return grid;
 		}
 	}
 
-	public class TileInfo : CellReference<TileMapNode, TileData>
+	public class TileInfo : CellReference<IObject2D, TileData>
 	{
-		public TileInfo(TileMapNode node) : base(node)
+		public TileInfo(ValueProvider<IObject2D> provider) : base(provider)
 		{
 		}
 

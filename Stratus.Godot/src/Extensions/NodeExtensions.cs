@@ -20,7 +20,7 @@ namespace Stratus.Godot.Extensions
 			return node.GetChildren().OfType<TNode>();
 		}
 
-		public static void LogInfo(this Node node, string message)
+		public static void Log(this Node node, string message)
 		{
 			StratusLog.Info($"[{node.Name}] {message}");
 		}

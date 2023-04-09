@@ -11,13 +11,13 @@ namespace Stratus.Godot.TileMaps
 	/// <summary>
 	/// A node that works on top of an existing <see cref="TileMap"/>
 	/// </summary>
-	public partial class TileMapNode : Node2D, IObject2D
+	public partial class TileMapNode : Node2D
 	{
 		public TileMap tileMap { get; private set; }
 		public bool ready => tileMap != null;
 		public Vector2I cellPosition => tileMap.LocalToMap(Position);
-		Vector2Int IObject2D.cellPosition => new Vector2Int(cellPosition.X, cellPosition.Y);
-		string IObject2D.name => Name;
+		//Vector2Int IObject2D.cellPosition => new Vector2Int(cellPosition.X, cellPosition.Y);
+		//string IObject2D.name => Name;
 
 		public event Action<Vector2Int> onMoved;
 
@@ -25,7 +25,7 @@ namespace Stratus.Godot.TileMaps
 		{
 		}
 
-		public void Initialize(TileMap tileMap)
+		public virtual void Initialize(TileMap tileMap)
 		{
 			this.tileMap = tileMap;
 			this.Reparent(tileMap);

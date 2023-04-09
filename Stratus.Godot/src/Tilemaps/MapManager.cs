@@ -129,7 +129,7 @@ namespace Stratus.Godot.TileMaps
 				return;
 			}
 
-			this.LogInfo($"Loading the map {map}");
+			this.Log($"Loading the map {map}");
 			this.mapNode = map;
 			cursor.Initialize(map.tileMap);
 			cursor.MoveTo(Vector2I.Zero);
@@ -139,7 +139,7 @@ namespace Stratus.Godot.TileMaps
 
 		public void Unload()
 		{
-			this.LogInfo($"Unloading the map");
+			this.Log($"Unloading the map");
 
 			cursor.Disable();
 			inputLayer.Pop();
