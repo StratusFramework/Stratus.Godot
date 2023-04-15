@@ -6,7 +6,7 @@ using Stratus.Godot.UI;
 
 namespace Stratus.Godot.TileMaps
 {
-	public abstract partial class MapNode : Node2D
+	public abstract partial class ManagedMapNode : Node2D
 	{
 		public MapManager map { get; private set; }
 
@@ -17,7 +17,7 @@ namespace Stratus.Godot.TileMaps
 		}
 	}
 
-	public abstract partial class TileMapGizmo : MapNode
+	public abstract partial class TileMapGizmo : ManagedMapNode
 	{
 		private MenuInputLayer input;
 

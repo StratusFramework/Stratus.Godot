@@ -30,7 +30,7 @@ namespace Stratus.Godot.Tilemaps
 				{
 					TileData data = tileMap.GetCellTileData(l, pos);
 					var _pos = pos.ToVector2Int();
-					var result = grid.Set(layer, new Object2D(data.ToString(), _pos), _pos);
+					var result = grid.Set(new Object2D(data.ToString(), layer, _pos), _pos);
 					if (!result)
 					{
 						StratusLog.Result(result);

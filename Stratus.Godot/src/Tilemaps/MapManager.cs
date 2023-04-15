@@ -53,7 +53,7 @@ namespace Stratus.Godot.TileMaps
 	}
 
 	public abstract partial class MapManager<TMap> : MapManager
-		where TMap : Map
+		where TMap : MapNode
 	{
 		public abstract Cursor2D cursor { get; }
 		public abstract Camera2D camera { get; }
@@ -101,7 +101,7 @@ namespace Stratus.Godot.TileMaps
 				StratusLog.Error("No camera has been set");
 			}
 
-			foreach (var gizmo in this.GetChildrenOfType<MapNode>())
+			foreach (var gizmo in this.GetChildrenOfType<ManagedMapNode>())
 			{
 				gizmo.Initialize(this);
 			}

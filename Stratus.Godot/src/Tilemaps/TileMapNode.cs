@@ -1,10 +1,13 @@
 ﻿using Godot;
 
+using Stratus.Extensions;
 using Stratus.Godot.Extensions;
 using Stratus.Models.Maps;
 using Stratus.Numerics;
 
 using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Stratus.Godot.TileMaps
 {
