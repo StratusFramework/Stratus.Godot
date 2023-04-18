@@ -2,8 +2,11 @@
 
 using Stratus.Godot.Extensions;
 using Stratus.Models.Maps;
+using Stratus.Models.Maps.Actions;
 using Stratus.Numerics;
 using Stratus.Utilities;
+
+using System.Collections.Generic;
 
 namespace Stratus.Godot.Tilemaps
 {
@@ -39,6 +42,15 @@ namespace Stratus.Godot.Tilemaps
 			}
 
 			return grid;
+		}
+
+		public override IEnumerable<ActorAction> GetActions(IActor2D actor)
+		{
+			// Base
+			foreach(var action in base.GetActions(actor))
+			{
+				yield return action;
+			}
 		}
 	}
 }

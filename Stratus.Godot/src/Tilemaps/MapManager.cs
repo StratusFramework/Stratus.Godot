@@ -83,18 +83,6 @@ namespace Stratus.Godot.TileMaps
 				}
 			});
 			GodotEventSystem.Connect<SelectCursorEvent>(e => SelectAtCursor());
-			GodotEventSystem.Connect<MovementRangeEvent.Request>(e =>
-			{
-				var range = map.GetRange(e.input);
-				if (range != null)
-				{
-					GodotEventSystem.Broadcast(new MovementRangeEvent.Response(e.input, range));
-				}
-				else
-				{
-					this.LogError($"Could not find the range for {e.input}");
-				}
-			});
 
 			if (camera == null)
 			{
