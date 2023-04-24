@@ -14,5 +14,4 @@ namespace Stratus.Godot.Extensions
 			return instance;
 		}
 	}
-
 }

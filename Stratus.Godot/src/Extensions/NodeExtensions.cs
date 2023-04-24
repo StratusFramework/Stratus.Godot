@@ -35,9 +35,20 @@ namespace Stratus.Godot.Extensions
 			StratusLog.Error($"[{node.Name}] {message}");
 		}
 
+		public static void Log(this Node node, Result result)
+			=> StratusLog.Result(result);
+
 		public static void Invoke(this Node node, Action action, double duration)
 		{
 			node.GetTree().CreateTimer(duration).Timeout += action;
+		}
+
+		public static TNode? InstantiateScene<TNode>(this Node2D parent, PackedScene scene)
+			where TNode : Node
+		{
+			var instance = scene.Instantiate<TNode>();
+			parent.AddChild(instance);
+			return instance;
 		}
 	}
 }

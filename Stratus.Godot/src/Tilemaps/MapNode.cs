@@ -5,6 +5,7 @@ using Stratus.Godot.Extensions;
 using Stratus.Godot.Tilemaps;
 
 using System;
+using System.Collections.Generic;
 
 namespace Stratus.Godot.TileMaps
 {
@@ -14,6 +15,9 @@ namespace Stratus.Godot.TileMaps
 		public TileMap tileMap;
 
 		public GodotMap map { get; protected set; }
+		public bool initialized { get; private set; }
+
+		public event Action onInitialized;
 
 		public override void _Ready()
 		{
@@ -31,15 +35,16 @@ namespace Stratus.Godot.TileMaps
 
 		public virtual void Initialize(TileMap tileMap)
 		{
+			this.Log("Initializing tilemap...");
 			map = new GodotMap(tileMap);
 		}
 
-		public static void InitializeAll<TNode>(Node2D node, TileMap tilemap, Action<TNode> action)
+		public static IEnumerable<TNode> InitializeAll<TNode>(Node2D node, TileMap tilemap, Action<TNode> action)
 			where TNode : TileMapNode
 		{
-			node.GetChildrenOfType<TNode>().ForEach(n =>
+			return node.GetChildrenOfType<TNode>().ForEach(n =>
 			{
-				n.Initialize(tilemap);
+				n.Attach(tilemap);
 				action(n);
 			});
 		}

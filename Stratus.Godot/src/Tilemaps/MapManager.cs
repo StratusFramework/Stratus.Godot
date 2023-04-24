@@ -3,9 +3,9 @@
 using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
-using Stratus.Models;
 using Stratus.Models.Maps;
-using Stratus.Models.Maps.Actions;
+
+using System.Linq;
 
 namespace Stratus.Godot.TileMaps
 {
@@ -52,12 +52,12 @@ namespace Stratus.Godot.TileMaps
 		public override string ToString() => Name;
 	}
 
-	public abstract partial class MapManager<TMap> : MapManager
-		where TMap : MapNode
+	public abstract partial class MapManager<TMapNode> : MapManager
+		where TMapNode : MapNode
 	{
 		public abstract Cursor2D cursor { get; }
 		public abstract Camera2D camera { get; }
-		public TMap mapNode { get; protected set; }
+		public TMapNode mapNode { get; protected set; }
 		public override IMap2D map => mapNode.map;
 		public override TileMap? tileMap => mapNode != null ? mapNode.tileMap : null;
 		public bool initialized { get; private set; }
@@ -67,7 +67,6 @@ namespace Stratus.Godot.TileMaps
 		private MapInputLayer inputLayer = new MapInputLayer();
 
 		#region Abstract
-		protected abstract void OnReady();
 		protected abstract void OnCursorMovedEvent(CursorMovedEvent e);
 		public abstract void SelectAtCursor();
 		#endregion
@@ -93,8 +92,6 @@ namespace Stratus.Godot.TileMaps
 			{
 				gizmo.Initialize(this);
 			}
-
-			OnReady();
 		}
 
 		public override void _Process(double delta)
@@ -104,32 +101,37 @@ namespace Stratus.Godot.TileMaps
 		#endregion
 
 		#region Loading
-		public void Load()
+		public void Load(TMapNode node)
 		{
-			Load(mapNode ?? this.GetChildOfType<TMap>());
-		}
-
-		public void Load(TMap map)
-		{
-			if (map == null)
+			if (node == null)
 			{
 				this.LogWarning("No map to load");
 				return;
 			}
 
-			this.Log($"Loading the map {map}");
-			this.mapNode = map;
-			cursor.Initialize(map.tileMap);
-			cursor.MoveTo(Vector2I.Zero);
+			this.mapNode = node;
+			this.Log($"Initializing the map node {node}");
+
+			var initialPosition = node.map.grid.Cells(DefaultMapLayer.Terrain).First();			
+			cursor.Attach(node.tileMap);
+			cursor.MoveTo(initialPosition);
 			inputLayer.Push();
 			initialized = true;
+			node.Visible = true;
+		}
+
+		public void Load(PackedScene scene)
+		{
+			this.Log($"Instancing the map scene {scene}");
+			var map = this.InstantiateScene<TMapNode>(scene);
+			Load(map);
 		}
 
 		public void Unload()
 		{
 			this.Log($"Unloading the map");
 
-			cursor.Disable();
+			cursor.Detach();
 			inputLayer.Pop();
 			initialized = false;
 		}

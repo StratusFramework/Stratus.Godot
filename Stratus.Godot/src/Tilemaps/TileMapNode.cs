@@ -15,8 +15,6 @@ namespace Stratus.Godot.TileMaps
 		public TileMap tileMap { get; private set; }
 		public bool ready => tileMap != null;
 		public Vector2I cellPosition => tileMap.LocalToMap(Position);
-		//Vector2Int IObject2D.cellPosition => new Vector2Int(cellPosition.X, cellPosition.Y);
-		//string IObject2D.name => Name;
 
 		public event Action<Vector2Int> onMoved;
 
@@ -24,14 +22,21 @@ namespace Stratus.Godot.TileMaps
 		{
 		}
 
-		public virtual void Initialize(TileMap tileMap)
+		public override string ToString()
 		{
-			this.tileMap = tileMap;
-			this.Reparent(tileMap);
-			SnapToClosest();
+			return Name;
 		}
 
-		public void Disable()
+		public virtual void Attach(TileMap tileMap)
+		{
+			StratusLog.AssertNotNull(tileMap, "No tilemap was given");
+			this.tileMap = tileMap;
+			Reparent(tileMap);
+			SnapToClosest();
+			this.Log($"Attached {this} to tilemap {tileMap}");
+		}
+
+		public void Detach()
 		{
 			tileMap = null;
 			Reparent(null);
@@ -57,11 +62,13 @@ namespace Stratus.Godot.TileMaps
 				return new Result<Vector2I>(false, cellPosition, $"Cannot move to position {position} as it does not exist");
 			}
 
-			onMoved?.Invoke(position.ToVector2Int());
-			var localPos = tileMap.MapToLocal(position);
+			var localPos = tileMap.MapToLocal(position);			
 			Position = localPos;
-			return new Result<Vector2I>(true, position);
+			onMoved?.Invoke(position.ToVector2Int());
+			return new Result<Vector2I>(true, position, $"Moved {this} to {position}");
 		}
+
+		public Result<Vector2I> MoveTo(Vector2Int position) => MoveTo(position.ToVector2I());
 
 		public bool Contains(Vector2I position)
 		{

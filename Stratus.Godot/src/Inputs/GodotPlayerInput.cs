@@ -63,18 +63,13 @@ namespace Stratus.Godot.Inputs
 		{
 			if (e.layer != layer)
 			{
-				this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
+				//this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
 				return;
 			}
 
 			DisableInputTemporarily();
 			inputLayers.Pop();
 		}
-
-		//private void OnInputLayerChanged(InputLayer layer)
-		//{
-		//	this.LogInfo($"Input layer <{layer}> is now {(layer.active ? "active" : "inactive")}");
-		//}
 
 		private void DisableInputTemporarily()
 		{

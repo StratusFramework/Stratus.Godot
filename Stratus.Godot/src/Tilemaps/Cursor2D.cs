@@ -40,10 +40,10 @@ namespace Stratus.Godot.TileMaps
 			{
 				GodotEventSystem.Broadcast(new CursorMovedEvent(move.result.ToVector2Int()));
 			}
-			else
-			{
-				StratusLog.Result(move);
-			}
+			//else
+			//{
+			//	StratusLog.Result(move);
+			//}
 		}
 	}
 
