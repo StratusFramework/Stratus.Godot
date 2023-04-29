@@ -63,7 +63,7 @@ namespace Stratus.Godot.Inputs
 		{
 			if (e.layer != layer)
 			{
-				//this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
+				this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
 				return;
 			}
 

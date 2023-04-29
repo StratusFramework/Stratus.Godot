@@ -2,10 +2,10 @@
 
 using Stratus.Collections;
 using Stratus.Extensions;
+using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
-using Stratus.Inputs;
 using Stratus.Logging;
-using Stratus.Models;
+using Stratus.Models.UI;
 
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace Stratus.Godot.UI
 {
 	public class InputLayerButtonNavigator : IStratusLogger
 	{
-		public MenuInputLayer layer { get; } 
+		public MenuInputLayer layer { get; }
 		protected List<Button> buttons = new();
 		protected ArrayNavigator<Button> menuNavigator = new();
 
@@ -24,17 +24,10 @@ namespace Stratus.Godot.UI
 		public InputLayerButtonNavigator(string name)
 		{
 			menuNavigator.onChanged += (curr, prev) => curr.GrabFocus();
-			//layer = new(name);
 			layer = new MenuInputLayer(name);
-			//layer.move = (dir) =>
-			//{
-			//	this.Log($"Moved {dir}");
-			//	menuNavigator.Navigate(new System.Numerics.Vector2(dir.X, dir.Y));
-			//};
-			//layer.select = () => menuNavigator.current._Pressed();
 			layer.cancel = Cancel;
 		}
-		
+
 		public void Set(params Button[] values)
 		{
 			buttons.Clear();
@@ -53,60 +46,107 @@ namespace Stratus.Godot.UI
 		}
 	}
 
-	public class InputLayeredMenuGenerator : InputLayerButtonNavigator
+	public class MenuGeneratorArguments
 	{
-		public Container container { get; }
+		public Control control { get; }
+
+		public MenuGeneratorArguments(Control control)
+		{
+			this.control = control;
+		}
+	}
+
+	public class InputLayeredMenuGenerator : MenuGenerator
+	{
+		private record Instance(IMenuEntry entry, Node node);
+
+		private InputLayerButtonNavigator input { get; }
 		public Control root { get; }
+		private Container container { get; }
+		private Theme theme { get; }
 
 		public event Action onOpen;
 		public event Action onClose;
 
-		public InputLayeredMenuGenerator(Container container, Control root = null)
-			: base(root.Name)
+		public InputLayeredMenuGenerator(Control root, Container container, Theme theme = null)
 		{
+			input = new InputLayerButtonNavigator(root.Name);
+			input.onCancel += Close;
+			this.theme = theme;
+			this.root = root;
 			this.container = container;
-			this.root = root ?? container;
 		}
 
-		public void Open(params LabeledAction[] actions)
+		public override void Open(Menu menu)
 		{
-			this.Log($"Opening Menu at {root}");
-
-			var actionButtons = actions.Select(action =>
-			{
-				var button = new Button();
-				button.Text = action.label;
-				button.Pressed += () =>
-				{
-					Close();
-					action.action();
-				};
-				container.AddChild(button);
-				return button;
-			}).ToArray();
-
-			Set(actionButtons);
-			root.Visible = true;
-			Focus();
-
-			layer.Push();
+			this.Log("Open");
+			Open(menu, false);
 			onOpen?.Invoke();
+			root.Visible = true;
+			input.layer.Push();
+			input.Focus();
 		}
 
-		protected override void Cancel()
+		private void Open(Menu menu, bool focus)
 		{
-			base.Cancel();
-			Close();
+			Clear();
+			current = menu;
+
+			List<Button> buttons = new List<Button>();
+			foreach (var item in menu.items)
+			{
+				Button button = new Button();
+				button.Text = item.name;
+				Action action = default;
+
+				if (item is MenuItem menuItem)
+				{
+					action = () =>
+					{
+						if (menuItem.action())
+						{
+							Close();
+						}
+					};
+				}
+				else if (item is Menu subMenu)
+				{
+					action = () =>
+					{
+						Open(subMenu, true);
+					};
+				}
+
+				button.Pressed += action;
+				buttons.Add(button);
+				container.AddChild(button);
+			}
+
+			input.Set(buttons.ToArray());
+			if (focus)
+			{
+				input.Focus();
+			}
 		}
 
-		public void Close()
+		public override void Close()
 		{
-			this.Log($"Closing Menu at {root}");
+			this.Log("Close");
+			if (current == null || current.parent == null)
+			{
+				root.Visible = false;
+				onClose?.Invoke();
+				input.layer.Pop();
+				Clear();
+			}
+			else
+			{
+				Open(current.parent, true);
+			}
+		}
 
-			root.Visible = false;
-			onClose?.Invoke();
-			layer.Pop();
-
+		private void Clear()
+		{
 			foreach (var child in container.GetChildren())
 			{
 				child.QueueFree();

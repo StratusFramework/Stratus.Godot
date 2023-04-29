@@ -50,5 +50,10 @@ namespace Stratus.Godot.Extensions
 			parent.AddChild(instance);
 			return instance;
 		}
+
+		public static void Quit(this Node node, int exitCode = 0)
+		{
+			node.GetTree().Quit(exitCode);
+		}
 	}
 }
