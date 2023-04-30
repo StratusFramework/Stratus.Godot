@@ -7,17 +7,17 @@ namespace Stratus.Godot.UI
 	public abstract partial class GeneratedMenuNode : Control
 	{
 		protected abstract Container container { get; }
-		private InputLayeredMenuGenerator generator;
+		protected InputLayeredMenuGenerator menu { get; private set; }
 
 		public override void _Ready()
 		{
-			generator = new InputLayeredMenuGenerator(this, container);
-			generator.Close();
+			menu = new InputLayeredMenuGenerator(this, container);
+			menu.Close();
 		}
 
-		protected void Open(Menu menu)
+		protected void Open(Menu _menu)
 		{
-			generator.Open(menu);
+			menu.Open(_menu);
 		}
 	}
 }

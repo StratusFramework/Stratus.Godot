@@ -29,9 +29,9 @@ namespace Stratus.Godot.Inputs
 			GodotEventSystem.Connect<InputLayer.PushEvent>(OnPushLayerEvent);
 			GodotEventSystem.Connect<InputLayer.PopEvent>(OnPopLayerEvent);
 			//inputLayers.onLayerToggled += this.OnInputLayerChanged;
-			//inputLayers.onPush += layer => this.LogInfo($"Input layer <{layer}> was pushed ({inputLayers.count})");
-			//inputLayers.onPop += layer => this.LogInfo($"Input layer <{layer}> was popped ({inputLayers.count})");
-			inputLayers.onQueue += layer => this.Log($"Input layer <{layer}> was queued ({inputLayers.count})");
+			inputLayers.onPush += layer => this.Log($"PUSH <{layer}> ({inputLayers.count})");
+			inputLayers.onPop += layer => this.Log($"POP <{layer}> ({inputLayers.count})");
+			inputLayers.onQueue += layer => this.Log($"QUEUE <{layer}> ({inputLayers.count})");
 			this.Log("Ready");
 		}
 
@@ -55,8 +55,7 @@ namespace Stratus.Godot.Inputs
 		private void OnPushLayerEvent(InputLayer.PushEvent e)
 		{
 			DisableInputTemporarily();
-			var push = inputLayers.Push(e.layer);
-			StratusLog.Result(push);
+			inputLayers.Push(e.layer);
 		}
 
 		private void OnPopLayerEvent(InputLayer.PopEvent e)

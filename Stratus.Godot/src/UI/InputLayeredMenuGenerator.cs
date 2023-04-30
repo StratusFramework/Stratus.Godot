@@ -1,7 +1,6 @@
 ﻿using Godot;
 
 using Stratus.Collections;
-using Stratus.Extensions;
 using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
 using Stratus.Logging;
@@ -9,7 +8,6 @@ using Stratus.Models.UI;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Stratus.Godot.UI
 {
@@ -72,6 +70,13 @@ namespace Stratus.Godot.UI
 		{
 			input = new InputLayerButtonNavigator(root.Name);
 			input.onCancel += Close;
+			input.layer.onActive += active =>
+			{
+				if (active)
+				{
+					input.Focus();
+				}
+			};
 			this.theme = theme;
 			this.root = root;
 			this.container = container;
@@ -84,7 +89,6 @@ namespace Stratus.Godot.UI
 			onOpen?.Invoke();
 			root.Visible = true;
 			input.layer.Push();
-			input.Focus();
 		}
 
 		private void Open(Menu menu, bool focus)
@@ -136,7 +140,10 @@ namespace Stratus.Godot.UI
 			{
 				root.Visible = false;
 				onClose?.Invoke();
-				input.layer.Pop();
+				if (input.layer.active)
+				{
+					input.layer.Pop();
+				}
 				Clear();
 			}
 			else

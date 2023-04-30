@@ -5,6 +5,7 @@ using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
 using Stratus.Models.Maps;
 
+using System;
 using System.Linq;
 
 namespace Stratus.Godot.TileMaps
@@ -63,8 +64,10 @@ namespace Stratus.Godot.TileMaps
 		public bool initialized { get; private set; }
 		public override Vector2I cursorPosition => cursor.cellPosition;
 
-
-		private MapInputLayer inputLayer = new MapInputLayer();
+		#region Events
+		public event Action onLoad;
+		public event Action onUnload;
+		#endregion
 
 		#region Abstract
 		protected abstract void OnCursorMovedEvent(CursorMovedEvent e);
@@ -76,10 +79,8 @@ namespace Stratus.Godot.TileMaps
 		{
 			GodotEventSystem.Connect<CursorMovedEvent>(e =>
 			{
-				if (inputLayer.active)
-				{
-					OnCursorMovedEvent(e);
-				}
+				// Check if input active or...?
+				OnCursorMovedEvent(e);
 			});
 			GodotEventSystem.Connect<SelectCursorEvent>(e => SelectAtCursor());
 
@@ -115,9 +116,9 @@ namespace Stratus.Godot.TileMaps
 			var initialPosition = node.map.grid.Cells(DefaultMapLayer.Terrain).First();			
 			cursor.Attach(node.tileMap);
 			cursor.MoveTo(initialPosition);
-			inputLayer.Push();
 			initialized = true;
 			node.Visible = true;
+			onLoad?.Invoke();
 		}
 
 		public void Load(PackedScene scene)
@@ -132,35 +133,12 @@ namespace Stratus.Godot.TileMaps
 			this.Log($"Unloading the map");
 
 			cursor.Detach();
-			inputLayer.Pop();
+			onUnload?.Invoke();
 			initialized = false;
 		}
 		#endregion
 	}
 
-	public enum MapInputAction
-	{
-		Move,
-		Select,
-		Cancel,
-		Menu,
-		Pause
-	}
+	// TODO: Refactor between setup map movement and encounter map movement
 
-	public class MapInputLayer : GodotInputLayer<MapInputAction>
-	{
-		protected override void Initialize()
-		{
-			map.Bind(MapInputAction.Move, value =>
-			{
-				var dir = new Vector2I((int)value.X, -(int)value.Y);
-				GodotEventSystem.Broadcast(new MoveCursorEvent(dir.ToVector2Int()));
-			});
-
-			map.Bind(MapInputAction.Select, () =>
-			{
-				GodotEventSystem.Broadcast(new SelectCursorEvent());
-			});
-		}
-	}
 }
