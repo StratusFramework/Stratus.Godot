@@ -39,7 +39,7 @@ namespace Stratus.Godot.TileMaps
 		public void Detach()
 		{
 			tileMap = null;
-			Reparent(null);
+			//Reparent(null);
 		}
 
 		public Result<Vector2I> Move(Vector2I direction)

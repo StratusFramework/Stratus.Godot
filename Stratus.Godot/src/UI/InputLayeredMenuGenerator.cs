@@ -28,14 +28,23 @@ namespace Stratus.Godot.UI
 
 		public void Set(params Button[] values)
 		{
-			buttons.Clear();
+			Clear();
 			buttons.AddRange(values);
 			menuNavigator.Set(buttons);
 		}
 
+		public void Clear()
+		{
+			buttons.Clear();
+			menuNavigator.Clear();
+		}
+
 		public void Focus()
 		{
-			menuNavigator.current.GrabFocus();
+			if (menuNavigator.valid)
+			{
+				menuNavigator.current?.GrabFocus();
+			}
 		}
 
 		protected virtual void Cancel()
@@ -61,30 +70,28 @@ namespace Stratus.Godot.UI
 		private InputLayerButtonNavigator input { get; }
 		public Control root { get; }
 		private Container container { get; }
-		private Theme theme { get; }
 
 		public event Action onOpen;
 		public event Action onClose;
 
-		public InputLayeredMenuGenerator(Control root, Container container, Theme theme = null)
+		public InputLayeredMenuGenerator(Control root, Container container)
 		{
 			input = new InputLayerButtonNavigator(root.Name);
 			input.onCancel += Close;
 			input.layer.onActive += active =>
 			{
+				//root.Visible = true;
 				if (active)
 				{
 					input.Focus();
 				}
 			};
-			this.theme = theme;
 			this.root = root;
 			this.container = container;
 		}
 
 		public override void Open(Menu menu)
 		{
-			this.Log("Open");
 			Open(menu, false);
 			onOpen?.Invoke();
 			root.Visible = true;
@@ -135,15 +142,12 @@ namespace Stratus.Godot.UI
 
 		public override void Close()
 		{
-			this.Log("Close");
 			if (current == null || current.parent == null)
 			{
 				root.Visible = false;
 				onClose?.Invoke();
-				if (input.layer.active)
-				{
-					input.layer.Pop();
-				}
+				input.layer.Pop();
+				input.Clear();
 				Clear();
 			}
 			else

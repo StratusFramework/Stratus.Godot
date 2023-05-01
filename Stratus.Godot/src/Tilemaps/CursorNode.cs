@@ -8,7 +8,7 @@ using Stratus.Numerics;
 
 namespace Stratus.Godot.TileMaps
 {
-	public partial class Cursor2D : TileMapNode
+	public abstract partial class CursorNode : TileMapNode
 	{
 		public override void _Ready()
 		{

@@ -1,5 +1,6 @@
 ﻿using Godot;
 
+using Stratus.Godot.Extensions;
 using Stratus.Models.UI;
 
 namespace Stratus.Godot.UI
@@ -17,6 +18,7 @@ namespace Stratus.Godot.UI
 
 		protected void Open(Menu _menu)
 		{
+			this.Log($"Opening menu {_menu}");
 			menu.Open(_menu);
 		}
 	}

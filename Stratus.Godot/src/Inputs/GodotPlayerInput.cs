@@ -29,9 +29,9 @@ namespace Stratus.Godot.Inputs
 			GodotEventSystem.Connect<InputLayer.PushEvent>(OnPushLayerEvent);
 			GodotEventSystem.Connect<InputLayer.PopEvent>(OnPopLayerEvent);
 			//inputLayers.onLayerToggled += this.OnInputLayerChanged;
-			inputLayers.onPush += layer => this.Log($"PUSH <{layer}> ({inputLayers.count})");
-			inputLayers.onPop += layer => this.Log($"POP <{layer}> ({inputLayers.count})");
-			inputLayers.onQueue += layer => this.Log($"QUEUE <{layer}> ({inputLayers.count})");
+			inputLayers.onPush += layer => this.Log($"PUSH <{layer}> ({inputLayers})");
+			inputLayers.onPop += layer => this.Log($"POP <{layer}> ({inputLayers})");
+			inputLayers.onQueue += layer => this.Log($"QUEUE <{layer}> ({inputLayers})");
 			this.Log("Ready");
 		}
 
@@ -60,14 +60,15 @@ namespace Stratus.Godot.Inputs
 
 		private void OnPopLayerEvent(InputLayer.PopEvent e)
 		{
-			if (e.layer != layer)
-			{
-				this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
-				return;
-			}
+			//if (e.layer != layer)
+			//{
+			//	this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
+			//	return;
+			//}
 
 			DisableInputTemporarily();
-			inputLayers.Pop();
+			inputLayers.TryPop(e.layer);
+			//inputLayers.Pop();
 		}
 
 		private void DisableInputTemporarily()

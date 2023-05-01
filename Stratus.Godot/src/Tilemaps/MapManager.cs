@@ -56,7 +56,7 @@ namespace Stratus.Godot.TileMaps
 	public abstract partial class MapManager<TMapNode> : MapManager
 		where TMapNode : MapNode
 	{
-		public abstract Cursor2D cursor { get; }
+		public abstract CursorNode cursor { get; }
 		public abstract Camera2D camera { get; }
 		public TMapNode mapNode { get; protected set; }
 		public override IMap2D map => mapNode.map;
