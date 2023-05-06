@@ -77,7 +77,13 @@ namespace Stratus.Godot.UI
 		public InputLayeredMenuGenerator(Control root, Container container)
 		{
 			input = new InputLayerButtonNavigator(root.Name);
-			input.onCancel += Close;
+			input.onCancel += () =>
+			{
+				if (current.closable)
+				{
+					Close();
+				}
+			};
 			input.layer.onActive += active =>
 			{
 				//root.Visible = true;
@@ -142,7 +148,9 @@ namespace Stratus.Godot.UI
 
 		public override void Close()
 		{
-			if (current == null || current.parent == null)
+			// Close for good
+			if (current == null
+				|| (current.parent == null))
 			{
 				root.Visible = false;
 				onClose?.Invoke();
