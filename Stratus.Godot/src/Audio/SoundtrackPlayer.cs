@@ -8,7 +8,7 @@ namespace Stratus.Godot.Audio
 	public partial class SoundtrackPlayer : AudioStreamPlayer
 	{
 		[Export]
-		public AudioChannelType channel = AudioChannelType.Background;
+		public DefaultAudioChannel channel = DefaultAudioChannel.Background;
 		[Export]
 		public Soundtrack soundtrack;
 

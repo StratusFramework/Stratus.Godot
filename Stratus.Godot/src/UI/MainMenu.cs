@@ -59,14 +59,14 @@ namespace Stratus.Godot.UI
 			Visible = true;
 			startButton.GrabFocus();
 			input.layer.Push();
-			this.Invoke(() => SoundtrackPlayer.Play(new PlayAudioEvent(AudioChannelType.Background, "mainmenu")), 1);
+			this.Invoke(() => SoundtrackPlayer.Play(new PlayAudioEvent(DefaultAudioChannel.Background, "mainmenu")), 1);
 		}
 
 		public void Close()
 		{
 			Visible = false;
 			input.layer.Pop();
-			SoundtrackPlayer.Stop(new StopAudioEvent(AudioChannelType.Background));
+			SoundtrackPlayer.Stop(new StopAudioEvent(DefaultAudioChannel.Background));
 		}
 		#endregion
 
