@@ -43,7 +43,7 @@ namespace Stratus.Godot.Extensions
 			node.GetTree().CreateTimer(duration).Timeout += action;
 		}
 
-		public static TNode? InstantiateScene<TNode>(this Node2D parent, PackedScene scene)
+		public static TNode? InstantiateScene<TNode>(this Node parent, PackedScene scene)
 			where TNode : Node
 		{
 			var instance = scene.Instantiate<TNode>();

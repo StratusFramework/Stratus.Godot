@@ -1,14 +1,11 @@
 using Godot;
 
-using Stratus.Events;
 using Stratus.Godot.Extensions;
-using Stratus.Models;
 using Stratus.Models.Maps;
-using Stratus.Numerics;
 
 namespace Stratus.Godot.TileMaps
 {
-	public abstract partial class CursorNode : TileMapNode
+	public partial class CursorNode : TileMapNode
 	{
 		public override void _Ready()
 		{
@@ -40,10 +37,6 @@ namespace Stratus.Godot.TileMaps
 			{
 				GodotEventSystem.Broadcast(new CursorMovedEvent(move.result.ToVector2Int()));
 			}
-			//else
-			//{
-			//	StratusLog.Result(move);
-			//}
 		}
 	}
 

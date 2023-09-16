@@ -1,12 +1,11 @@
 ﻿using Godot;
 
-using Stratus.Inputs;
 using Stratus.Godot.Extensions;
-using Stratus.Extensions;
+using Stratus.Inputs;
 
 namespace Stratus.Godot.Inputs
 {
-	public abstract class GodotPlayerInput : Node
+	public partial class GodotPlayerInput : Node
 	{
 		#region Properties
 		private InputStack<InputLayer> inputLayers = new InputStack<InputLayer>();

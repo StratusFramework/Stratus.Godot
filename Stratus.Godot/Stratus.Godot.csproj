@@ -8,16 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GodotSharp" Version="4.0.0" />
-    <PackageReference Include="GodotSharpEditor" Version="4.0.0" />
+    <Compile Remove="src\Models\**" />
+    <EmbeddedResource Remove="src\Models\**" />
+    <None Remove="src\Models\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Stratus\Stratus\Stratus.csproj" />
+    <PackageReference Include="Godot.SourceGenerators" Version="4.1.1" />
+    <PackageReference Include="GodotSharp" Version="4.1.1" />
+    <PackageReference Include="GodotSharpEditor" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Models\States\" />
+    <ProjectReference Include="..\..\..\Stratus\Stratus\Stratus.csproj" />
   </ItemGroup>
 
 </Project>
