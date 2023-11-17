@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Stratus\Stratus\Stratus.csproj" />
+    <ProjectReference Include="..\..\Stratus\Stratus\Stratus.csproj" />
   </ItemGroup>
 
 </Project>

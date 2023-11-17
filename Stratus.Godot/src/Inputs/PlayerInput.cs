@@ -5,7 +5,7 @@ using Stratus.Inputs;
 
 namespace Stratus.Godot.Inputs
 {
-	public partial class GodotPlayerInput : Node
+	public partial class PlayerInput : Node
 	{
 		#region Properties
 		private InputStack<InputLayer> inputLayers = new InputStack<InputLayer>();
