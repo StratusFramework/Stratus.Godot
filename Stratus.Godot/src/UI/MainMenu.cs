@@ -6,6 +6,7 @@ using Stratus.Godot.Inputs;
 using Stratus.Models;
 using Stratus.Models.Audio;
 using Stratus.Models.States;
+using Stratus.Models.UI;
 
 namespace Stratus.Godot.UI
 {
@@ -29,6 +30,7 @@ namespace Stratus.Godot.UI
 			quitButton.ButtonDown += Quit;
 			input.Set(startButton, quitButton);
 
+			GameState.Set(new MainMenuState());
 			GodotEventSystem.Connect<MainMenuEvent>(e => Open());
 			GodotEventSystem.Connect<EndGameEvent>(e =>
 			{
