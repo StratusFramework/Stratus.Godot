@@ -68,13 +68,28 @@ namespace Stratus.Godot.UI
 		private record Instance(IMenuEntry entry, Node node);
 
 		private InputLayerButtonNavigator input { get; }
-		public Control root { get; }
+		public Node root { get; }
+		private bool visible
+		{
+			set
+			{
+				if (root is CanvasLayer cl)
+				{
+					cl.Visible = value;
+				}
+				else if (root is Control c)
+				{
+					c.Visible = value;
+				}
+			}
+		}
+		public bool opened { get; private set; }
 		private Container container { get; }
 
 		public event Action onOpen;
 		public event Action onClose;
 
-		public InputLayeredMenuGenerator(Control root, Container container)
+		public InputLayeredMenuGenerator(Node root, Container container)
 		{
 			input = new InputLayerButtonNavigator(root.Name);
 			input.onCancel += () =>
@@ -100,8 +115,8 @@ namespace Stratus.Godot.UI
 		{
 			Open(menu, false);
 			onOpen?.Invoke();
-			root.Visible = true;
-			input.layer.Push();
+			opened = visible = true;
+			input.layer.Push();			
 		}
 
 		private void Open(Menu menu, bool focus)
@@ -152,7 +167,7 @@ namespace Stratus.Godot.UI
 			if (current == null
 				|| (current.parent == null))
 			{
-				root.Visible = false;
+				opened = visible = false;
 				onClose?.Invoke();
 				input.layer.Pop();
 				input.Clear();

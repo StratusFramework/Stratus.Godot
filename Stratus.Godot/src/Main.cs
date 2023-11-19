@@ -13,6 +13,13 @@ namespace Stratus.Godot
 		public override void _Ready()
 		{
 			GodotEventSystem.Connect<NewGameEvent>(OnGameStartedEvent);
+			GameState.onChange += this.OnGameStateChanged;
+			GameState.Push<MainMenuState>();
+		}
+
+		private void OnGameStateChanged(GameState state, StateTransition transition)
+		{
+			this.Log($"Game state {state.name} is now {transition}");
 		}
 
 		private void OnGameStartedEvent(NewGameEvent e)

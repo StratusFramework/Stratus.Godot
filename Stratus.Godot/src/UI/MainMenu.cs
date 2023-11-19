@@ -10,65 +10,27 @@ using Stratus.Models.UI;
 
 namespace Stratus.Godot.UI
 {
-	public partial class MainMenu : CanvasLayer
+	public partial class MainMenu : GameStateMenu<MainMenuState>
 	{
-		#region Fields
-		[Export]
-		public BoxContainer actionButtons;
-		[Export]
-		public Button startButton;
-		[Export]
-		public Button quitButton;
-
-		private InputLayerButtonNavigator input = new InputLayerButtonNavigator("Main Menu");
-		#endregion
-
-		#region Messages
-		public override void _Ready()
+		#region Messages		
+		public override void Open()
 		{
-			startButton.ButtonDown += Start;
-			quitButton.ButtonDown += Quit;
-			input.Set(startButton, quitButton);
-
-			GameState.Set(new MainMenuState());
-			GodotEventSystem.Connect<MainMenuEvent>(e => Open());
-			GodotEventSystem.Connect<EndGameEvent>(e =>
-			{
-				Open();
-			});
-
-			Open();
-		}
-		#endregion
-
-		#region Interface
-		public void Add(params LabeledAction[] actions)
-		{
-			foreach(var action in actions)
-			{
-				Button button = new Button();
-				button.Name = action.label;
-				button.ButtonDown += action.action;
-
-				actionButtons.AddChild(button);
-			}
-		}
-		#endregion
-
-		#region Callbacks
-		public void Open()
-		{
-			Visible = true;
-			startButton.GrabFocus();
-			input.layer.Push();
+			base.Open();
 			this.Invoke(() => SoundtrackPlayer.Play(new PlayAudioEvent(DefaultAudioChannel.Background, "mainmenu")), 1);
 		}
 
-		public void Close()
+		public override void Close()
 		{
-			Visible = false;
-			input.layer.Pop();
+			base.Close();
 			SoundtrackPlayer.Stop(new StopAudioEvent(DefaultAudioChannel.Background));
+		}
+
+		protected override Menu Generate()
+		{
+			var menu = new Menu("Main Menu");
+			menu.Item("Start", Start);
+			menu.Item("Quit", Quit);
+			return menu;
 		}
 		#endregion
 

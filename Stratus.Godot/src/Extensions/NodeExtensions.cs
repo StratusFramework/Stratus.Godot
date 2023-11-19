@@ -51,6 +51,12 @@ namespace Stratus.Godot.Extensions
 			return instance;
 		}
 
+		public static void Destroy(this Node instance)
+		{
+			instance.GetTree().CurrentScene.RemoveChild(instance);
+			instance.QueueFree();
+		}
+
 		public static void Quit(this Node node, int exitCode = 0)
 		{
 			node.GetTree().Quit(exitCode);
