@@ -31,8 +31,8 @@ namespace Stratus.Godot.UI
 		public override void _Ready()
 		{
 			base._Ready();
-			GameState.Enabled<TState>(Open);
-			GameState.Disabled<TState>(Close);
+			StateStack.Entered<TState>(this, Open);
+			StateStack.Exited<TState>(this, Close);
 			menu = new InputLayeredMenuGenerator(this, container);
 			Visible = false;
 		}

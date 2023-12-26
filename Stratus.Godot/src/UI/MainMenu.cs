@@ -30,6 +30,7 @@ namespace Stratus.Godot.UI
 			var menu = new Menu("Main Menu");
 			menu.Item("Start", Start);
 			menu.Item("Quit", Quit);
+			menu.NotClosable();
 			return menu;
 		}
 		#endregion
@@ -39,7 +40,7 @@ namespace Stratus.Godot.UI
 		{
 			Close();
 			this.Log("Starting game");
-			GodotEventSystem.Broadcast(new NewGameEvent());
+			GodotEventSystem.Broadcast(new StartGameEvent());
 		}
 
 		private void Quit()

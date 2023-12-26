@@ -94,7 +94,7 @@ namespace Stratus.Godot.UI
 			input = new InputLayerButtonNavigator(root.Name);
 			input.onCancel += () =>
 			{
-				if (current.closable)
+				if (current.exitOnCancel)
 				{
 					Close();
 				}

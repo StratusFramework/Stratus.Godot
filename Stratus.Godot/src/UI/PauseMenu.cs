@@ -8,12 +8,12 @@ namespace Stratus.Godot.UI
 		protected override Menu Generate()
 		{
 			var menu = new Menu("Pause");
-			menu.Item("Resume", GameState.Pop);
-			menu.Item("Help", () =>
+			menu.Item("Resume", StateStack.Exit);
+			menu.Item("Help", () => StratusLog.Info("HELP!"), false);
+			menu.Item("Quit", () =>
 			{
-
+				GodotEventSystem.Broadcast(new EndGameEvent());
 			});
-			menu.Item("Quit", () => GameState.Return<MainMenuState>());
 			return menu;
 		}
 	}
