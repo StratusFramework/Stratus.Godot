@@ -1,13 +1,8 @@
 ﻿using Godot;
 
-using Stratus.Godot.Audio;
 using Stratus.Godot.Extensions;
-using Stratus.Godot.Inputs;
-using Stratus.Models.Audio;
 using Stratus.Models.States;
 using Stratus.Models.UI;
-
-using System;
 
 namespace Stratus.Godot.UI
 {
@@ -21,8 +16,7 @@ namespace Stratus.Godot.UI
 		private Container _container;
 
 		protected Container container => _container;
-
-		private static readonly Type type = typeof(TState);
+		protected TState state => StateStack.Get<TState>();
 
 		protected abstract Menu Generate();
 

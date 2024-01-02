@@ -29,18 +29,24 @@ namespace Stratus.Godot.UI
 		{
 			var menu = new Menu("Main Menu");
 			menu.Item("Start", Start);
+			menu.Item("Options", Options);
 			menu.Item("Quit", Quit);
 			menu.NotClosable();
 			return menu;
 		}
 		#endregion
 
-		#region Procedures
+		#region Menu Items
 		private void Start()
 		{
 			Close();
 			this.Log("Starting game");
 			GodotEventSystem.Broadcast(new StartGameEvent());
+		}
+
+		private void Options()
+		{
+			StateStack.Enter<OptionsMenuState>();
 		}
 
 		private void Quit()

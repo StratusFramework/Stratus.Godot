@@ -1,10 +1,11 @@
 ﻿using Godot;
 
 using Stratus.Collections;
-using Stratus.Godot.Extensions;
+using Stratus.Extensions;
 using Stratus.Godot.Inputs;
 using Stratus.Logging;
 using Stratus.Models.UI;
+using Stratus.Utilities;
 
 using System;
 using System.Collections.Generic;
@@ -116,7 +117,7 @@ namespace Stratus.Godot.UI
 			Open(menu, false);
 			onOpen?.Invoke();
 			opened = visible = true;
-			input.layer.Push();			
+			input.layer.Push();
 		}
 
 		private void Open(Menu menu, bool focus)
@@ -125,33 +126,87 @@ namespace Stratus.Godot.UI
 			current = menu;
 
 			List<Button> buttons = new List<Button>();
-			foreach (var item in menu.items)
+			foreach (var entry in menu.items)
 			{
-				Button button = new Button();
-				button.Text = item.name;
+				Button button = new Button();				
+				button.Text = entry.name;
 				Action action = default;
 
-				if (item is MenuItem menuItem)
+				if (entry is MenuItem item)
 				{
 					action = () =>
 					{
-						if (menuItem.action())
+						if (item.action())
 						{
 							Close();
 						}
 					};
+					container.AddChild(button);
 				}
-				else if (item is Menu subMenu)
+				// Unlike others, this will require a label + control
+				else if (entry is MenuOption option)
+				{
+					FlowContainer frame = new FlowContainer();					
+					container.AddChild(frame);
+					frame.AddChild(button);
+
+					switch (option.reference.inferredType)
+					{
+						case Reflection.InferredType.Boolean:
+							CheckButton checkBox = new CheckButton();
+							checkBox.ToggleMode = (bool)option.reference.value;
+							checkBox.Toggled += value =>
+							{
+								option.reference.value = value;
+							};
+							frame.AddChild(checkBox);
+							break;
+
+						case Reflection.InferredType.Integer:
+							break;
+						case Reflection.InferredType.Float:
+							break;
+						case Reflection.InferredType.String:
+							break;
+						case Reflection.InferredType.Enum:
+							OptionButton optionButton = new OptionButton();
+							var values = EnumUtility.Values(option.reference.type);
+							values.ForEach(v => optionButton.AddItem(v.ToString()));
+							optionButton.Selected = EnumUtility.ToInteger((Enum)option.reference.value);
+							optionButton.ItemSelected += idx =>
+							{
+								var value = values[idx];
+								option.reference.value = value;
+							};
+							frame.AddChild(optionButton);
+							break;
+
+						case Reflection.InferredType.Vector2:
+							break;
+						case Reflection.InferredType.Vector3:
+							break;
+						case Reflection.InferredType.Vector4:
+							break;
+						case Reflection.InferredType.Color:
+							break;
+					}
+				}
+				else if (entry is Menu subMenu)
 				{
 					action = () =>
 					{
 						Open(subMenu, true);
 					};
+					container.AddChild(button);
+				}
+
+				if (action == null)
+				{
+					action = () => { };
 				}
 
 				button.Pressed += action;
 				buttons.Add(button);
-				container.AddChild(button);
 			}
 
 			input.Set(buttons.ToArray());
