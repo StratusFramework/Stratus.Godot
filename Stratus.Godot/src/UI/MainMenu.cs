@@ -5,12 +5,14 @@ using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
 using Stratus.Models;
 using Stratus.Models.Audio;
+using Stratus.Models.Gameflow;
 using Stratus.Models.States;
 using Stratus.Models.UI;
+using Stratus.src.Models.Games;
 
 namespace Stratus.Godot.UI
 {
-	public partial class MainMenu : GameStateMenu<MainMenuState>
+    public partial class MainMenu : GameStateMenu<MainMenuState>
 	{
 		#region Messages		
 		public override void Open()
@@ -28,9 +30,9 @@ namespace Stratus.Godot.UI
 		protected override Menu Generate()
 		{
 			var menu = new Menu("Main Menu");
-			menu.Item("Start", Start);
-			menu.Item("Options", Options);
-			menu.Item("Quit", Quit);
+			menu.Action("Start", Start);
+			menu.Action("Options", Options);
+			menu.Action("Quit", Quit);
 			menu.NotClosable();
 			return menu;
 		}
@@ -46,7 +48,7 @@ namespace Stratus.Godot.UI
 
 		private void Options()
 		{
-			StateStack.Enter<OptionsMenuState>();
+			GameState.Enter<OptionsMenuState>();
 		}
 
 		private void Quit()

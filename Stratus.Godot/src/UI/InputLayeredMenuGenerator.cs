@@ -146,7 +146,7 @@ namespace Stratus.Godot.UI
 				// Unlike others, this will require a label + control
 				else if (entry is MenuOption option)
 				{
-					FlowContainer frame = new FlowContainer();					
+					Container frame = new HSplitContainer();					
 					container.AddChild(frame);
 					frame.AddChild(button);
 
@@ -165,6 +165,20 @@ namespace Stratus.Godot.UI
 						case Reflection.InferredType.Integer:
 							break;
 						case Reflection.InferredType.Float:
+							HSlider slider = new HSlider();
+							if (option.numericRange != null)
+							{
+								slider.MinValue = option.numericRange.minimum;
+								slider.MaxValue = option.numericRange.maximum;
+								slider.Step = slider.MaxValue * 0.05f; // 20 steps
+							}
+							slider.Value = (float)option.reference.value;
+							slider.ValueChanged += value =>
+							{
+								option.reference.value = Convert.ToSingle(value);
+							};
+							frame.AddChild(slider);
+
 							break;
 						case Reflection.InferredType.String:
 							break;

@@ -1,5 +1,6 @@
 using Godot;
 
+using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Models.Maps;
 

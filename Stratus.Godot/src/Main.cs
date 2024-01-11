@@ -3,11 +3,13 @@ using Godot;
 using Prototypes;
 
 using Stratus.Godot.Extensions;
+using Stratus.Models.Gameflow;
 using Stratus.Models.States;
+using Stratus.src.Models.Games;
 
 namespace Stratus.Godot
 {
-	public partial class Main : Node
+    public partial class Main : Node
 	{
 		[Export]
 		public PackedScene scene;
@@ -19,11 +21,11 @@ namespace Stratus.Godot
 			GodotEventSystem.Connect<StartGameEvent>(OnGameStartedEvent);
 			GodotEventSystem.Connect<EndGameEvent>(OnGameEndedEvent);
 
-			StateStack.Changed(OnGameStateChanged);
-			StateStack.Enter<MainMenuState>();
+			GameState.Changed(OnGameStateChanged);
+			GameState.Enter<MainMenuState>();
 		}
 
-		private void OnGameStateChanged(GameState state, StateTransition action)
+		private void OnGameStateChanged(State state, StateTransition action)
 		{
 			this.Log($"GAMESTATE {action.ToString().ToUpper()} {state.name}");
 		}
@@ -37,7 +39,7 @@ namespace Stratus.Godot
 
 		private void OnGameEndedEvent(EndGameEvent e)
 		{
-			StateStack.Return<MainMenuState>();
+			GameState.Return<MainMenuState>();
 			gameNode.Destroy();
 			this.Log("Ended game");
 		}

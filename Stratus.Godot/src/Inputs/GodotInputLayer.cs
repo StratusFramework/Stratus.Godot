@@ -1,14 +1,15 @@
 ﻿using Godot;
 
 using Stratus.Inputs;
-
+using Stratus.Models.Gameflow;
+using Stratus.src.Models.Games;
 using System;
 
 using static Stratus.Inputs.InputLayer;
 
 namespace Stratus.Godot.Inputs
 {
-	public abstract class GodotInputLayer<TAction> : InputLayer<InputEvent, GodotInputActionMapHandler>
+    public abstract class GodotInputLayer<TAction> : InputLayer<InputEvent, GodotInputActionMapHandler>
 		where TAction : Enum
 	{
 		public GodotInputLayer(string name = null) : base(name ?? typeof(TAction).Name, 
@@ -39,5 +40,21 @@ namespace Stratus.Godot.Inputs
 		ui_right,
 		ui_up,
 		ui_down
+	}
+
+	public abstract class GodotInputGameState<TInputLayer> : InputState<TInputLayer>
+		where TInputLayer : InputLayer, new()
+	{
+		public override void Enter()
+		{
+			base.Enter();
+			inputLayer.Push();
+		}
+
+		public override void Exit()
+		{
+			base.Exit();
+			inputLayer.Pop();
+		}
 	}
 }

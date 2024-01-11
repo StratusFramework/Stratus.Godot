@@ -1,22 +1,23 @@
 ﻿using Godot;
 
 using Stratus.Godot.Extensions;
-using Stratus.Models.States;
+using Stratus.Models.Gameflow;
 using Stratus.Models.UI;
+using Stratus.src.Models.Games;
 
 namespace Stratus.Godot.UI
 {
-	/// <summary>
-	/// The menu to be used
-	/// </summary>
-	public abstract partial class GameStateMenu<TState> : CanvasLayer
-		where TState : GameState
+    /// <summary>
+    /// The menu to be used
+    /// </summary>
+    public abstract partial class GameStateMenu<TState> : CanvasLayer
+		where TState : State
 	{
 		[Export]
 		private Container _container;
 
 		protected Container container => _container;
-		protected TState state => StateStack.Get<TState>();
+		protected TState state => GameState.Get<TState>();
 
 		protected abstract Menu Generate();
 
@@ -25,8 +26,8 @@ namespace Stratus.Godot.UI
 		public override void _Ready()
 		{
 			base._Ready();
-			StateStack.Entered<TState>(this, Open);
-			StateStack.Exited<TState>(this, Close);
+			GameState.Entered<TState>(this, Open);
+			GameState.Exited<TState>(this, Close);
 			menu = new InputLayeredMenuGenerator(this, container);
 			Visible = false;
 		}

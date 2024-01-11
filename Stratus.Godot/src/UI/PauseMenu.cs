@@ -1,20 +1,23 @@
-﻿using Stratus.Models.States;
+﻿using Stratus.Models.Gameflow;
 using Stratus.Models.UI;
+using Stratus.src.Models.Games;
 
 namespace Stratus.Godot.UI
 {
 	public partial class PauseMenu : GameStateMenu<PauseState>
 	{
-		protected override Menu Generate()
+		public override void _Ready()
 		{
-			var menu = new Menu("Pause");
-			menu.Item("Resume", StateStack.Exit);
-			menu.Item("Help", () => StratusLog.Info("HELP!"), false);
-			menu.Item("Quit", () =>
+			base._Ready();
+
+			state.menu.Action("Resume", GameState.Exit);
+			state.menu.Action("Help", () => StratusLog.Info("HELP!"), false);
+			state.menu.Action("Quit", () =>
 			{
 				GodotEventSystem.Broadcast(new EndGameEvent());
 			});
-			return menu;
 		}
+
+		protected override Menu Generate() => state.menu;
 	}
 }
