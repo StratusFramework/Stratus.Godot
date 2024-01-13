@@ -1,5 +1,6 @@
 ﻿using Godot;
 
+using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Models.Audio;
 
@@ -15,8 +16,8 @@ namespace Stratus.Godot.Audio
 		public override void _Ready()
 		{
 			base._Ready();
-			GodotEventSystem.Connect<PlayAudioEvent>(OnPlayAudioEvent);
-			GodotEventSystem.Connect<StopAudioEvent>(OnStopAudioEvent);
+			EventSystem.Connect<PlayAudioEvent>(OnPlayAudioEvent);
+			EventSystem.Connect<StopAudioEvent>(OnStopAudioEvent);
 		}
 
 		private void OnStopAudioEvent(StopAudioEvent e)
@@ -53,9 +54,9 @@ namespace Stratus.Godot.Audio
 		}
 
 		public static void Play(PlayAudioEvent e)
-			=> GodotEventSystem.Broadcast(e);
+			=> EventSystem.Broadcast(e);
 
 		public static void Stop(StopAudioEvent e)
-			=> GodotEventSystem.Broadcast(e);
+			=> EventSystem.Broadcast(e);
 	}
 }

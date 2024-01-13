@@ -10,7 +10,7 @@ namespace Stratus.Godot.TileMaps
 	{
 		public override void _Ready()
 		{
-			GodotEventSystem.Connect<MoveCursorEvent>(e =>
+			EventSystem.Connect<MoveCursorEvent>(e =>
 			{
 				if (e.range != null)
 				{
@@ -25,7 +25,7 @@ namespace Stratus.Godot.TileMaps
 				OnMoved(move);
 			});
 
-			GodotEventSystem.Connect<SetCursorEvent>(e =>
+			EventSystem.Connect<SetCursorEvent>(e =>
 			{
 				var move = MoveTo(e.position.ToVector2I());
 				OnMoved(move);
@@ -36,7 +36,7 @@ namespace Stratus.Godot.TileMaps
 		{
 			if (move)
 			{
-				GodotEventSystem.Broadcast(new CursorMovedEvent(move.result.ToVector2Int()));
+				EventSystem.Broadcast(new CursorMovedEvent(move.result.ToVector2Int()));
 			}
 		}
 	}

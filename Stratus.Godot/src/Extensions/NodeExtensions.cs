@@ -25,6 +25,8 @@ namespace Stratus.Godot.Extensions
 			StratusLog.Info($"[{node.Name}] {message}");
 		}
 
+		public static void Log(this Node node, object obj) => Log(node, obj.ToString());
+
 		public static void LogWarning(this Node node, string message)
 		{
 			StratusLog.Warning($"[{node.Name}] {message}");

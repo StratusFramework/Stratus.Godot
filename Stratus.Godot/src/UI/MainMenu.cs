@@ -1,5 +1,6 @@
 using Godot;
 
+using Stratus.Events;
 using Stratus.Godot.Audio;
 using Stratus.Godot.Extensions;
 using Stratus.Godot.Inputs;
@@ -43,7 +44,7 @@ namespace Stratus.Godot.UI
 		{
 			Close();
 			this.Log("Starting game");
-			GodotEventSystem.Broadcast(new StartGameEvent());
+			EventSystem.Broadcast(new StartGameEvent());
 		}
 
 		private void Options()

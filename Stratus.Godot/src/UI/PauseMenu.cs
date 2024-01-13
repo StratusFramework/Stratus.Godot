@@ -1,4 +1,5 @@
-﻿using Stratus.Models.Gameflow;
+﻿using Stratus.Events;
+using Stratus.Models.Gameflow;
 using Stratus.Models.UI;
 using Stratus.src.Models.Games;
 
@@ -14,7 +15,7 @@ namespace Stratus.Godot.UI
 			state.menu.Action("Help", () => StratusLog.Info("HELP!"), false);
 			state.menu.Action("Quit", () =>
 			{
-				GodotEventSystem.Broadcast(new EndGameEvent());
+				EventSystem.Broadcast(new EndGameEvent());
 			});
 		}
 

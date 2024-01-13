@@ -1,5 +1,6 @@
 ﻿using Godot;
 
+using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Inputs;
 
@@ -25,8 +26,8 @@ namespace Stratus.Godot.Inputs
 		#region Messages
 		public override void _Ready()
 		{
-			GodotEventSystem.Connect<InputLayer.PushEvent>(OnPushLayerEvent);
-			GodotEventSystem.Connect<InputLayer.PopEvent>(OnPopLayerEvent);
+			EventSystem.Connect<InputLayer.PushEvent>(OnPushLayerEvent);
+			EventSystem.Connect<InputLayer.PopEvent>(OnPopLayerEvent);
 			//inputLayers.onLayerToggled += this.OnInputLayerChanged;
 			inputLayers.onPush += layer => this.Log($"PUSH <{layer}> ({inputLayers})");
 			inputLayers.onPop += layer => this.Log($"POP <{layer}> ({inputLayers})");

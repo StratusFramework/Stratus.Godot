@@ -1,15 +1,17 @@
 using Godot;
 
-using Prototypes;
-
+using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Models.Gameflow;
 using Stratus.Models.States;
-using Stratus.src.Models.Games;
+using Stratus.Models.UI;
 
 namespace Stratus.Godot
 {
-    public partial class Main : Node
+	/// <summary>
+	/// The root node of the simulation
+	/// </summary>
+	public partial class Main : Node
 	{
 		[Export]
 		public PackedScene scene;
@@ -18,11 +20,11 @@ namespace Stratus.Godot
 
 		public override void _Ready()
 		{
-			GodotEventSystem.Connect<StartGameEvent>(OnGameStartedEvent);
-			GodotEventSystem.Connect<EndGameEvent>(OnGameEndedEvent);
-
+			EventSystem.configuration.logAll = true;
 			GameState.Changed(OnGameStateChanged);
-			GameState.Enter<MainMenuState>();
+			EventSystem.Connect<StartGameEvent>(OnGameStartedEvent);
+			EventSystem.Connect<EndGameEvent>(OnGameEndedEvent);
+			EventSystem.Broadcast(new FadeOutEvent(0f, OpenMainMenu));			
 		}
 
 		private void OnGameStateChanged(State state, StateTransition action)
@@ -42,6 +44,12 @@ namespace Stratus.Godot
 			GameState.Return<MainMenuState>();
 			gameNode.Destroy();
 			this.Log("Ended game");
+		}
+
+		private void OpenMainMenu()
+		{
+			GameState.Enter<MainMenuState>();
+			EventSystem.Broadcast(new FadeInEvent(1f, null));
 		}
 	}
 

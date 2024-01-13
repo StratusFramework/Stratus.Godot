@@ -1,45 +1,85 @@
 ﻿using Godot;
 
-using System;
+using Stratus.Events;
+using Stratus.Godot.Extensions;
+using Stratus.Interpolation;
+using Stratus.Models.UI;
 
 namespace Stratus.Godot.UI
 {
-	public partial class FadeTransitionScreen : Node2D
+	/// <summary>
+	/// Handles doing a fade transition through the usage of a <see cref="ColorRect"/>
+	/// </summary>
+	public partial class FadeTransitionScreen : CanvasLayer
 	{
 		[Export]
-		private AnimationPlayer player;
+		private ColorRect colorRect;
 		[Export]
-		private string fadeInAnimation = "FadeIn";
-		[Export]
-		private string fadeOutAnimation = "FadeOut";
+		private bool fadeOutOnStart = true;
 
-		private Action queuedAction;
+		private ActionGroup actions = new();
 
 		public override void _Ready()
 		{
 			base._Ready();
-			player.AnimationFinished += this.OnAnimationFinished;
-		}
-
-		private void OnAnimationFinished(StringName animName)
-		{
-			if (queuedAction != null)
+			EventSystem.Connect<FadeInEvent>(FadeIn);
+			EventSystem.Connect<FadeOutEvent>(FadeOut);
+			actions.onLog += this.Actions_onLog;
+			if (fadeOutOnStart)
 			{
-				queuedAction();
+				FadeOut(new FadeOutEvent(0, null));
 			}
-			queuedAction = null;
 		}
 
-		public async void FadeIn(Action action, bool instant = false)
+		private void Actions_onLog(string obj)
 		{
-			queuedAction = action;
-			player.Play(fadeInAnimation);
+			this.Log(obj);
 		}
 
-		public async void FadeOut(Action action, bool instant = false)
+		public override void _Process(double delta)
 		{
-			queuedAction = action;
-			player.Play(fadeOutAnimation);
+			base._Process(delta);
+			actions.Update((float)delta);
+		}
+
+		public void FadeIn(FadeInEvent e)
+		{
+			this.Log(e);
+			const float alpha = 0f;
+			if (e.duration == 0f)
+			{
+				colorRect.Color = colorRect.Color.Alpha(alpha);
+				e.onFinished?.Invoke();
+			}
+			else
+			{
+				var seq = actions.Sequence();
+				seq.Property(() => colorRect.Color, colorRect.Color.Alpha(alpha), e.duration, Ease.Linear);
+				if (e.onFinished != null)
+				{
+					seq.Call(e.onFinished);
+				}
+			}
+		}
+
+		public void FadeOut(FadeOutEvent e)
+		{
+			this.Log(e);
+			const float alpha = 1f;
+			if (e.duration == 0f)
+			{
+				colorRect.Color = colorRect.Color.Alpha(alpha);
+				e.onFinished?.Invoke();
+			}
+			else
+			{
+				var seq = actions.Sequence();
+				seq.Property(() => colorRect.Color, colorRect.Color.Alpha(alpha), e.duration, Ease.Linear);
+				if (e.onFinished != null)
+				{
+					seq.Call(e.onFinished);
+				}
+			}
 		}
 	}
 }

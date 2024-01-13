@@ -1,5 +1,6 @@
 ﻿using Godot;
 
+using Stratus.Events;
 using Stratus.Inputs;
 using Stratus.Models.Gameflow;
 using Stratus.src.Models.Games;
@@ -22,12 +23,12 @@ namespace Stratus.Godot.Inputs
 	{
 		public static void Push(this InputLayer layer)
 		{
-			GodotEventSystem.Broadcast(new PushEvent(layer));
+			EventSystem.Broadcast(new PushEvent(layer));
 		}
 
 		public static void Pop(this InputLayer layer)
 		{
-			GodotEventSystem.Broadcast(new PopEvent(layer));
+			EventSystem.Broadcast(new PopEvent(layer));
 		}
 	}
 

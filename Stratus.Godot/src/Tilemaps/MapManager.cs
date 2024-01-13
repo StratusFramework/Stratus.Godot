@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Stratus.Godot.TileMaps
 {
-	public abstract class TileMapEvent : Event
+	public abstract record TileMapEvent : Event
 	{
 		public TileMap tileMap { get; }
 
@@ -20,7 +20,7 @@ namespace Stratus.Godot.TileMaps
 		}
 	}
 
-	public abstract class MapEvent : Event
+	public abstract record MapEvent : Event
 	{
 		public Vector2I position { get; }
 
@@ -43,7 +43,7 @@ namespace Stratus.Godot.TileMaps
 		public abstract Vector2I cursorPosition { get; }
 		public abstract IMap2D map { get; }
 
-		public class LoadEvent : TileMapEvent
+		public record LoadEvent : TileMapEvent
 		{
 			public LoadEvent(TileMap tileMap) : base(tileMap)
 			{
@@ -77,12 +77,12 @@ namespace Stratus.Godot.TileMaps
 		#region Engine
 		public override void _Ready()
 		{
-			GodotEventSystem.Connect<CursorMovedEvent>(e =>
+			EventSystem.Connect<CursorMovedEvent>(e =>
 			{
 				// Check if input active or...?
 				OnCursorMovedEvent(e);
 			});
-			GodotEventSystem.Connect<SelectCursorEvent>(e => SelectAtCursor());
+			EventSystem.Connect<SelectCursorEvent>(e => SelectAtCursor());
 
 			if (camera == null)
 			{
