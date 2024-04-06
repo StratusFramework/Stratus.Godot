@@ -1,10 +1,17 @@
 using Godot;
+using Godot.Collections;
 
 using Stratus.Events;
 using Stratus.Godot.Extensions;
+using Stratus.Godot.Inputs;
+using Stratus.Godot.UI;
+using Stratus.Inputs;
+using Stratus.Interpolation;
 using Stratus.Models.Gameflow;
 using Stratus.Models.States;
 using Stratus.Models.UI;
+
+using System;
 
 namespace Stratus.Godot
 {
@@ -15,8 +22,11 @@ namespace Stratus.Godot
 	{
 		[Export]
 		public PackedScene scene;
+		[Export]
+		private float transitionDuration = 1f;
 
 		private Node gameNode;
+		private ActionGroup actions = new();
 
 		public override void _Ready()
 		{
@@ -24,7 +34,13 @@ namespace Stratus.Godot
 			GameState.Changed(OnGameStateChanged);
 			EventSystem.Connect<StartGameEvent>(OnGameStartedEvent);
 			EventSystem.Connect<EndGameEvent>(OnGameEndedEvent);
-			EventSystem.Broadcast(new FadeOutEvent(0f, OpenMainMenu));			
+			Transition<MainMenuState>(0f, 1f);
+		}
+
+		public override void _Process(double delta)
+		{
+			base._Process(delta);
+			actions.Update((float)delta);
 		}
 
 		private void OnGameStateChanged(State state, StateTransition action)
@@ -35,21 +51,41 @@ namespace Stratus.Godot
 		private void OnGameStartedEvent(StartGameEvent e)
 		{
 			StratusLog.AssertNotNull(scene, "Scene not set");
-			gameNode = this.InstantiateScene<Node>(scene);
-			this.Log($"Starting game with scene {gameNode.Name}");
+			Transition(transitionDuration, () => gameNode = this.InstantiateScene<Node>(scene), transitionDuration);
 		}
 
 		private void OnGameEndedEvent(EndGameEvent e)
 		{
-			GameState.Return<MainMenuState>();
-			gameNode.Destroy();
+			Transition(transitionDuration, () =>
+			{
+				GameState.Return<MainMenuState>();
+				gameNode.Destroy();
+			}, transitionDuration);
 			this.Log("Ended game");
+		}
+
+		private void Transition(float fadeOut, Action action, float fadeIn)
+		{
+			actions.Sequence()
+				.Event(new ToggleInputEvent(false))
+				.Event(new FadeOutEvent(fadeOut))
+				.Delay(fadeOut)
+				.Call(action)
+				.Event(new FadeInEvent(fadeIn))
+				.Delay(fadeIn)
+				.Event(new ToggleInputEvent(true));
 		}
 
 		private void OpenMainMenu()
 		{
 			GameState.Enter<MainMenuState>();
 			EventSystem.Broadcast(new FadeInEvent(1f, null));
+		}
+
+		private void Transition<TState>(float fadeOutDuration, float fadeInDuration)
+			where TState : State
+		{
+			EventSystem.Broadcast(new FadeOutInEvent(fadeOutDuration, () => GameState.Enter<TState>(), fadeInDuration));
 		}
 	}
 

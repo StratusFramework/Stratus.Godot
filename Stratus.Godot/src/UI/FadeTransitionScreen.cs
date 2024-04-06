@@ -10,7 +10,7 @@ namespace Stratus.Godot.UI
 	/// <summary>
 	/// Handles doing a fade transition through the usage of a <see cref="ColorRect"/>
 	/// </summary>
-	public partial class FadeTransitionScreen : CanvasLayer
+	public partial class FadeTransitionScreen : CanvasLayer, IFadeEventHandler
 	{
 		[Export]
 		private ColorRect colorRect;
@@ -24,22 +24,27 @@ namespace Stratus.Godot.UI
 			base._Ready();
 			EventSystem.Connect<FadeInEvent>(FadeIn);
 			EventSystem.Connect<FadeOutEvent>(FadeOut);
-			actions.onLog += this.Actions_onLog;
+			EventSystem.Connect<FadeOutInEvent>(FadeOutIn);
+
 			if (fadeOutOnStart)
 			{
 				FadeOut(new FadeOutEvent(0, null));
 			}
 		}
 
-		private void Actions_onLog(string obj)
-		{
-			this.Log(obj);
-		}
-
 		public override void _Process(double delta)
 		{
 			base._Process(delta);
 			actions.Update((float)delta);
+		}
+
+		public void FadeOutIn(FadeOutInEvent e)
+		{
+			this.Log(e);
+			var seq = actions.Sequence();
+			seq.Property(() => colorRect.Color, colorRect.Color.Alpha(1f), e.fadeOutDuration, Ease.Linear);
+			seq.Call(e.transition);
+			seq.Property(() => colorRect.Color, colorRect.Color.Alpha(0f), e.fadeInDuration, Ease.Linear);
 		}
 
 		public void FadeIn(FadeInEvent e)

@@ -9,11 +9,17 @@ namespace Stratus.Godot.Inputs
 	public partial class PlayerInput : Node
 	{
 		#region Properties
-		private InputStack<InputLayer> inputLayers = new InputStack<InputLayer>();
+		/// <summary>
+		/// The current input layers
+		/// </summary>
+		private InputStack<InputLayer> inputLayers { get; } = new InputStack<InputLayer>();
 		/// <summary>
 		/// The current input layer
 		/// </summary>
 		public InputLayer layer => inputLayers.current;
+		/// <summary>
+		/// Whether an input layer is present
+		/// </summary>
 		public bool hasInputLayer => inputLayers.hasLayers;
 		/// <summary>
 		/// Can be used to toggle input processing
@@ -28,7 +34,12 @@ namespace Stratus.Godot.Inputs
 		{
 			EventSystem.Connect<InputLayer.PushEvent>(OnPushLayerEvent);
 			EventSystem.Connect<InputLayer.PopEvent>(OnPopLayerEvent);
-			//inputLayers.onLayerToggled += this.OnInputLayerChanged;
+			EventSystem.Connect<ToggleInputEvent>(e =>
+			{
+				inputEnabled = e.toggle;
+
+			});
+
 			inputLayers.onPush += layer => this.Log($"PUSH <{layer}> ({inputLayers})");
 			inputLayers.onPop += layer => this.Log($"POP <{layer}> ({inputLayers})");
 			inputLayers.onQueue += layer => this.Log($"QUEUE <{layer}> ({inputLayers})");
@@ -46,6 +57,7 @@ namespace Stratus.Godot.Inputs
 				else
 				{
 					layer.HandleInput(@event);
+					GetViewport().SetInputAsHandled();
 				}
 			}
 		}
@@ -60,15 +72,8 @@ namespace Stratus.Godot.Inputs
 
 		private void OnPopLayerEvent(InputLayer.PopEvent e)
 		{
-			//if (e.layer != layer)
-			//{
-			//	this.LogWarning($"Could not pop layer <{e.layer}> as it not currently at the top (<{layer}>)");
-			//	return;
-			//}
-
 			DisableInputTemporarily();
 			inputLayers.TryPop(e.layer);
-			//inputLayers.Pop();
 		}
 
 		private void DisableInputTemporarily()
