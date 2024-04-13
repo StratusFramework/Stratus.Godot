@@ -11,7 +11,22 @@ namespace Stratus.Godot.Extensions
 		public static TNode? GetChildOfType<TNode>(this Node node)
 			where TNode : Node
 		{
-			return node.GetChildren().OfType<TNode>().FirstOrDefault();
+			return node.GetChildrenOfType<TNode>().FirstOrDefault();
+		}
+
+		public static TNode? GetParentOfType<TNode>(this Node node)
+			where TNode : Node
+		{
+			Node current = node.GetParent();
+			while (current != null)
+			{
+				if (current is TNode result)
+				{
+					return result;
+				}
+				current = current.GetParent();
+			}
+			return null;
 		}
 
 		public static IEnumerable<TNode> GetChildrenOfType<TNode>(this Node node)

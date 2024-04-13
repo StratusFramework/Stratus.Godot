@@ -12,5 +12,7 @@ namespace Stratus.Godot.Extensions
 		public static Vector3Int ToVector3Int(this Vector2I value) => new Vector3Int(value.X, value.Y);
 
 		public static Vector2Int ToVector2Int(this Vector2I value) => new Vector2Int(value.X, value.Y);
+
+		public static System.Numerics.Vector3 ToSystemVector3(this Vector3 value) => new System.Numerics.Vector3(value.X, value.Y, value.Z);
 	}
 }
