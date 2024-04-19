@@ -19,7 +19,14 @@ namespace Stratus.Godot.Actors
 		[Export]
 		public Area3D area;
 		[Export]
-		public AnimationTree animationTree;
+		public StateMachineRig3D rig;
+		[Export]
+		public float sprintMultiplier = 2;
+
+		/// <summary>
+		/// IF true, will affect the base speed by a multiplier
+		/// </summary>
+		public bool sprint { get; set; }
 
 		public System.Numerics.Vector3 position => Position.ToSystemVector3();
 		public string name => Name;
@@ -27,20 +34,23 @@ namespace Stratus.Godot.Actors
 		private Vector3? direction;
 		private Node3D pivot;
 		private bool receivedInput;
-
+		private Vector3 previousVelocity;
 
 		public override void _Ready()
 		{
 			base._Ready();
 			pivot = GetNode<Node3D>("Pivot");
+
 			if (area != null)
 			{
 				SetupDetection();
 			}
-			if (animationTree != null)
+			if (rig != null)
 			{
 			}
 		}
+
+		public void ToggleSprint(bool toggle) => sprint = toggle;
 
 		public void Move(Vector3 value)
 		{
@@ -81,8 +91,11 @@ namespace Stratus.Godot.Actors
 				direction = Vector3.Zero;
 			}
 
+			previousVelocity = Velocity;
+
 			float delta_f = (float)delta;
-			var newVelocity = Velocity.Lerp(direction.Value * speed, acceleration * delta_f);
+			float targetSpeed = sprint ? sprintMultiplier * speed : speed;
+			var newVelocity = Velocity.Lerp(direction.Value * targetSpeed, acceleration * delta_f);
 			newVelocity.Y = 0;
 			if (direction.Value.Length() == 0 && newVelocity.Length() < stoppingSpeed)
 			{
@@ -97,6 +110,8 @@ namespace Stratus.Godot.Actors
 			{
 				OnSlideCollision();
 			}
+
+			UpdateAnimation();
 		}
 
 		private void OnSlideCollision()
@@ -135,6 +150,29 @@ namespace Stratus.Godot.Actors
 		{
 			this.Log($"{body} has entered my area");
 			NotifyObjects();
+		}
+
+		private void UpdateAnimation()
+		{
+			if (rig == null)
+			{
+				return;
+			}
+
+			if (previousVelocity == Velocity)
+			{
+				return;
+			}
+
+			// ALso handle run..
+			if (Velocity.Length() > 0)
+			{
+				rig.Set(sprint ? DefaultAnimation.Run : DefaultAnimation.Walk);
+			}
+			else
+			{
+				rig.Set(DefaultAnimation.Idle);
+			}
 		}
 
 		private void NotifyObjects()

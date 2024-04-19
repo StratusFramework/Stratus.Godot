@@ -46,7 +46,7 @@ namespace Stratus.Godot.Inputs
 			this.Log("Ready");
 		}
 
-		public override void _UnhandledInput(InputEvent @event)
+		public override void _UnhandledInput(InputEvent inputEvent)
 		{
 			if (inputEnabled && hasInputLayer)
 			{
@@ -56,7 +56,8 @@ namespace Stratus.Godot.Inputs
 				}
 				else
 				{
-					layer.HandleInput(@event);
+					//this.Log($"Handling input {inputEvent}");
+					layer.HandleInput(inputEvent);
 					GetViewport().SetInputAsHandled();
 				}
 			}
