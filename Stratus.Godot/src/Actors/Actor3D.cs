@@ -1,6 +1,5 @@
 using Godot;
 
-using Stratus.Godot.Actors;
 using Stratus.Godot.Extensions;
 using Stratus.Models.Actors;
 
@@ -11,9 +10,9 @@ namespace Stratus.Godot.Actors
 	public partial class Actor3D : CharacterBody3D, IActor3D
 	{
 		[Export]
-		public int speed { get; set; } = 10;
+		public int speed { get; set; } = 5;
 		[Export]
-		public int acceleration { get; set; } = 5;
+		public int acceleration { get; set; } = 3;
 		[Export]
 		public int fallAcceleration { get; set; } = 75;
 		[Export]
@@ -33,8 +32,11 @@ namespace Stratus.Godot.Actors
 
 		private Vector3? direction;
 		private Node3D pivot;
-		private bool receivedInput;
 		private Vector3 previousVelocity;
+		private Func<Vector3> getInput;
+
+		private bool receivedInput;
+		public bool pollingInput => getInput != null;
 
 		public override void _Ready()
 		{
@@ -50,17 +52,32 @@ namespace Stratus.Godot.Actors
 			}
 		}
 
-		public void ToggleSprint(bool toggle) => sprint = toggle;
+		public void ToggleSprint(bool toggle)
+		{
+			sprint = toggle;
+		}
+
+		/// <summary>
+		/// When set, will poll for the movement input internally by using the provider function.
+		/// </summary>
+		/// <param name="getInput"></param>
+		public void Poll(Func<Vector3> getInput)
+		{
+			this.getInput = getInput;
+		}
 
 		public void Move(Vector3 value)
 		{
 			if (value == Vector3.Zero)
 			{
-				return;
+				direction = value;
+			}
+			else
+			{
+				direction = value.Normalized();
+				pivot.LookAt(Position + direction.Value, Vector3.Up);
 			}
 
-			direction = value.Normalized();
-			pivot.LookAt(Position + direction.Value, Vector3.Up);
 			receivedInput = true;
 		}
 
@@ -68,19 +85,11 @@ namespace Stratus.Godot.Actors
 		{
 			const float stoppingSpeed = 1f;
 
-			/**
-			 *
-			 * 	# We separate out the y velocity to not interpolate on the gravity
-				var y_velocity := velocity.y
-				velocity.y = 0.0
-				velocity = velocity.lerp(_move_direction * move_speed, acceleration * delta)
-				if _move_direction.length() == 0 and velocity.length() < stopping_speed:
-					velocity = Vector3.ZERO
-				velocity.y = y_velocity
-			 *
-			 */
-
-			if (!receivedInput)
+			if (pollingInput)
+			{
+				Move(getInput());
+			}
+			else
 			{
 				// Exit early
 				if (Velocity == Vector3.Zero)

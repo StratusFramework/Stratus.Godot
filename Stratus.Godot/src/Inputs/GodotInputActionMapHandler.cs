@@ -4,17 +4,31 @@ using Stratus.Events;
 using Stratus.Inputs;
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Stratus.Godot
 {
-	public class CompositeActionNames
+	public class CompositeActionNames : IEnumerable<StringName>
 	{
-		public string xPositive;
-		public string xNegative;
+		public StringName xPositive;
+		public StringName xNegative;
 
-		public string yPositive;
-		public string yNegative;
+		public StringName yPositive;
+		public StringName yNegative;
+
+		public IEnumerator<StringName> GetEnumerator()
+		{
+			yield return xPositive;
+			yield return xNegative;
+			yield return yPositive;
+			yield return yNegative;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
+		}
 	}
 
 	public class GodotInputActionMapHandler : ActionMapHandler<InputEvent>
@@ -50,6 +64,7 @@ namespace Stratus.Godot
 
 		public override bool HandleInput(InputEvent input)
 		{
+			bool handled = false;
 			if (input.IsActionType())
 			{
 				foreach (var binding in actions.Values)
@@ -61,7 +76,7 @@ namespace Stratus.Godot
 								if (input.IsAction(binding.name))
 								{
 									binding.action(input);
-									return true;
+									handled = true;
 								}
 							}
 							break;
@@ -69,13 +84,14 @@ namespace Stratus.Godot
 						case InputActionType.Composite:
 							{
 								binding.action(input);
+								handled = true;
 							}
 							break;
 					}
 				}
 			}
 
-			return false;
+			return handled;
 		}
 
 		public void Bind<TAction>(TAction name, Action<Vector2> action)
@@ -96,15 +112,30 @@ namespace Stratus.Godot
 				yNegative = $"{name}{vector2Pattern[3]}"
 			});
 
-			Bind(name, InputActionType.Composite, @event =>
+			Bind(name, InputActionType.Composite, inputEvent =>
 			{
-				var names = compositeActionNames[name];
+				var actionNames = compositeActionNames[name];
 
-				if (@event.IsAction(names.xNegative) || @event.IsAction(names.xPositive)
-					|| @event.IsAction(names.yPositive) || @event.IsAction(names.yNegative))
+				if (inputEvent.IsAction(actionNames.xNegative) || inputEvent.IsAction(actionNames.xPositive)
+					|| inputEvent.IsAction(actionNames.yPositive) || inputEvent.IsAction(actionNames.yNegative))
 				{
-					var value = Input.GetVector(names.xNegative, names.xPositive, names.yPositive, names.yNegative);
+					var value = Input.GetVector(actionNames.xNegative, actionNames.xPositive, actionNames.yPositive, actionNames.yNegative);
 					action(value);
+				}
+			});
+		}
+
+		public void BindPress(string action, Action<bool> onToggle)
+		{
+			Bind(action, InputActionType.Button, e =>
+			{
+				if (e.IsActionPressed(action))
+				{
+					onToggle?.Invoke(true);
+				}
+				else if (e.IsActionReleased(action))
+				{
+					onToggle?.Invoke(false);
 				}
 			});
 		}

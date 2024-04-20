@@ -10,10 +10,10 @@ using static Stratus.Inputs.InputLayer;
 
 namespace Stratus.Godot.Inputs
 {
-    public abstract class GodotInputLayer<TAction> : InputLayer<InputEvent, GodotInputActionMapHandler>
+	public abstract class GodotInputLayer<TAction> : InputLayer<InputEvent, GodotInputActionMapHandler>
 		where TAction : Enum
 	{
-		public GodotInputLayer(string name = null) : base(name ?? typeof(TAction).Name, 
+		public GodotInputLayer(string name = null) : base(name ?? typeof(TAction).Name,
 			new GodotInputActionMapHandler(typeof(TAction).Name))
 		{
 		}
@@ -29,6 +29,62 @@ namespace Stratus.Godot.Inputs
 		public static void Pop(this InputLayer layer)
 		{
 			EventSystem.Broadcast(new PopEvent(layer));
+		}
+	}
+
+	public enum MovementInputAction
+	{
+		move_left,
+		move_right,
+		move_up,
+		move_down
+	}
+
+	/// <summary>
+	/// Used to hold axis input state during polling
+	/// </summary>
+	public class AxisInputState
+	{
+		public bool left;
+		public bool right;
+		public bool up;
+		public bool down;
+
+		public Vector2 xy
+		{
+			get
+			{
+				float x = 0;
+
+				if (right)
+				{
+					x = 1f;
+				}
+				else if (left)
+				{
+					x = -1f;
+				}
+
+				float y = 0;
+				if (up)
+				{
+					y = -1f;
+				}
+				else if (down)
+				{
+					y = 1f;
+				}
+				return new Vector2(x, y);
+			}
+		}
+
+		public Vector3 xz
+		{
+			get
+			{
+				var input = xy;
+				return new Vector3(input.X, 0, input.Y);
+			}
 		}
 	}
 

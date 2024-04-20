@@ -56,7 +56,6 @@ namespace Stratus.Godot.Inputs
 				}
 				else
 				{
-					//this.Log($"Handling input {inputEvent}");
 					layer.HandleInput(inputEvent);
 					GetViewport().SetInputAsHandled();
 				}
