@@ -2,6 +2,7 @@
 
 using Stratus.Events;
 using Stratus.Inputs;
+using Stratus.Models;
 
 using System;
 using System.Collections;
@@ -136,6 +137,18 @@ namespace Stratus.Godot
 				else if (e.IsActionReleased(action))
 				{
 					onToggle?.Invoke(false);
+				}
+			});
+		}
+
+		public void BindPress(Enumerated action, Action onPress)
+		{
+			string actionName = action.ToString().ToLowerInvariant();
+			Bind(action, InputActionType.Button, e =>
+			{
+				if (e.IsActionPressed(actionName))
+				{
+					onPress();
 				}
 			});
 		}

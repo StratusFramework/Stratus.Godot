@@ -1,14 +1,23 @@
 using Godot;
 
+using Stratus.Collections;
+using Stratus.Extensions;
 using Stratus.Godot.Extensions;
 using Stratus.Models.Actors;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Stratus.Godot.Actors
 {
+	/// <summary>
+	/// Handles movement and basic actions for an <see cref="IActor3D"/> such as interacting with other 
+	/// <see cref="IObject"/>.
+	/// </summary>
 	public partial class Actor3D : CharacterBody3D, IActor3D
 	{
+		#region Export Fields
 		[Export]
 		public int speed { get; set; } = 5;
 		[Export]
@@ -21,23 +30,33 @@ namespace Stratus.Godot.Actors
 		public StateMachineRig3D rig;
 		[Export]
 		public float sprintMultiplier = 2;
+		#endregion
 
-		/// <summary>
-		/// IF true, will affect the base speed by a multiplier
-		/// </summary>
-		public bool sprint { get; set; }
-
-		public System.Numerics.Vector3 position => Position.ToSystemVector3();
-		public string name => Name;
-
+		#region Private Fields
+		private ArrayNavigator<Object3D> _objectsInRange = new();
 		private Vector3? direction;
 		private Node3D pivot;
 		private Vector3 previousVelocity;
 		private Func<Vector3> getInput;
-
 		private bool receivedInput;
-		public bool pollingInput => getInput != null;
+		#endregion
 
+		#region Properties
+		/// <summary>
+		/// IF true, will affect the base speed by a multiplier
+		/// </summary>
+		public bool sprint { get; set; }
+		public string name => Name;
+		public System.Numerics.Vector3 position => Position.ToSystemVector3();
+		public bool pollingInput => getInput != null;
+		/// <summary>
+		/// When using <see cref="Interact"/>, will change
+		/// </summary>
+		/// <remarks>Reset whenever the interactives in range change</remarks>
+		public IArrayNavigator<Object3D> objectsInRange => _objectsInRange;
+		#endregion
+
+		#region Messages
 		public override void _Ready()
 		{
 			base._Ready();
@@ -50,35 +69,6 @@ namespace Stratus.Godot.Actors
 			if (rig != null)
 			{
 			}
-		}
-
-		public void ToggleSprint(bool toggle)
-		{
-			sprint = toggle;
-		}
-
-		/// <summary>
-		/// When set, will poll for the movement input internally by using the provider function.
-		/// </summary>
-		/// <param name="getInput"></param>
-		public void Poll(Func<Vector3> getInput)
-		{
-			this.getInput = getInput;
-		}
-
-		public void Move(Vector3 value)
-		{
-			if (value == Vector3.Zero)
-			{
-				direction = value;
-			}
-			else
-			{
-				direction = value.Normalized();
-				pivot.LookAt(Position + direction.Value, Vector3.Up);
-			}
-
-			receivedInput = true;
 		}
 
 		public override void _PhysicsProcess(double delta)
@@ -122,7 +112,62 @@ namespace Stratus.Godot.Actors
 
 			UpdateAnimation();
 		}
+		#endregion
 
+
+		#region Interface
+		/// <summary>
+		/// When set, will poll for the movement input internally by using the provider function.
+		/// </summary>
+		/// <param name="getInput"></param>
+		public void Poll(Func<Vector3> getInput)
+		{
+			this.getInput = getInput;
+		}
+
+		/// <summary>
+		/// Moves the actor in the given direction
+		/// </summary>
+		/// <param name="value"></param>
+		public void Move(Vector3 value)
+		{
+			if (value == Vector3.Zero)
+			{
+				direction = value;
+			}
+			else
+			{
+				direction = value.Normalized();
+				pivot.LookAt(Position + direction.Value, Vector3.Up);
+			}
+
+			receivedInput = true;
+		}
+
+		/// <summary>
+		/// Toggles sprinting for the actor
+		/// </summary>
+		/// <param name="toggle"></param>
+		public void ToggleSprint(bool toggle)
+		{
+			sprint = toggle;
+		}
+
+		/// <summary>
+		/// Interacts with one of the <see cref="IObject"/> in range
+		/// </summary>
+		/// <param name="index"></param>
+		public void Interact()
+		{
+			if (objectsInRange.valid)
+			{
+				rig.Set(DefaultAnimation.Interact);
+				this.Log($"Interacting with {objectsInRange.current.name}");
+			}
+		}
+		#endregion
+
+		#region Procedures
 		private void OnSlideCollision()
 		{
 			var collision = GetLastSlideCollision();
@@ -135,11 +180,11 @@ namespace Stratus.Godot.Actors
 			var object3d = node.GetParentOfType<Object3D>();
 			if (object3d != null)
 			{
-				this.Log($"Collided with object {object3d.Name}");
+				//this.Log($"Collided with object {object3d.Name}");
 			}
 			else
 			{
-				this.Log($"Collided with {node.Name}");
+				//this.Log($"Collided with {node.Name}");
 			}
 		}
 
@@ -152,13 +197,13 @@ namespace Stratus.Godot.Actors
 		private void Area_BodyExited(Node3D body)
 		{
 			this.Log($"{body} has exited my area");
-			NotifyObjects();
+			UpdateObjectsInRange();
 		}
 
 		private void Area_BodyEntered(Node3D body)
 		{
 			this.Log($"{body} has entered my area");
-			NotifyObjects();
+			UpdateObjectsInRange();
 		}
 
 		private void UpdateAnimation()
@@ -173,7 +218,6 @@ namespace Stratus.Godot.Actors
 				return;
 			}
 
-			// ALso handle run..
 			if (Velocity.Length() > 0)
 			{
 				rig.Set(sprint ? DefaultAnimation.Run : DefaultAnimation.Walk);
@@ -184,9 +228,16 @@ namespace Stratus.Godot.Actors
 			}
 		}
 
-		private void NotifyObjects()
+		private void UpdateObjectsInRange()
 		{
 			var bodies = area.GetOverlappingBodies();
+			var objects = bodies.Select(b => b.GetParentOfType<Object3D>()).Where(o => o != null).ToArray();
+			_objectsInRange.Set(objects);
+			if (_objectsInRange.valid)
+			{
+				this.Log($"Can interact with {_objectsInRange.values.ToStringJoin(",", StratusStringEnclosure.SquareBracket, o => o.name)}");
+			}
 		}
+		#endregion
 	}
 }

@@ -33,6 +33,8 @@ namespace Stratus.Godot.Actors
 		Idle,
 		Walk,
 		Run,
+
+		Interact,
 		Jump
 	}
 }
