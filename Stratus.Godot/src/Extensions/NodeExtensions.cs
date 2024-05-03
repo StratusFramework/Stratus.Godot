@@ -29,6 +29,27 @@ namespace Stratus.Godot.Extensions
 			return null;
 		}
 
+		public static void Toggle(this Node node)
+		{
+			if (node.ProcessMode == Node.ProcessModeEnum.Inherit)
+			{
+				node.Toggle(false);
+			}
+			else if (node.ProcessMode == Node.ProcessModeEnum.Disabled)
+			{
+				node.Toggle(true);
+			}
+		}
+
+		public static void Toggle(this Node node, bool enable)
+		{
+			node.ProcessMode = enable ? Node.ProcessModeEnum.Inherit : Node.ProcessModeEnum.Disabled;
+			if (node is Node3D node3d)
+			{
+				node3d.Visible = enable;
+			}
+		}
+
 		public static IEnumerable<TNode> GetChildrenOfType<TNode>(this Node node)
 			where TNode : Node
 		{

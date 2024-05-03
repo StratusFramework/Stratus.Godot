@@ -163,6 +163,7 @@ namespace Stratus.Godot.Actors
 			{
 				rig.Set(DefaultAnimation.Interact);
 				this.Log($"Interacting with {objectsInRange.current.name}");
+				objectsInRange.current.Interact(this);
 			}
 		}
 		#endregion
