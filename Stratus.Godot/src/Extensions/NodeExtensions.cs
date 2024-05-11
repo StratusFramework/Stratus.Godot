@@ -50,6 +50,19 @@ namespace Stratus.Godot.Extensions
 			}
 		}
 
+		/// <summary>
+		/// Removes all the children from this node
+		/// </summary>
+		/// <param name="node"></param>
+		public static void ClearChildren(this Node node)
+		{
+			foreach (var child in node.GetChildren())
+			{
+				//node.RemoveChild(child);
+				child.Destroy();
+			}
+		}
+
 		public static IEnumerable<TNode> GetChildrenOfType<TNode>(this Node node)
 			where TNode : Node
 		{
@@ -91,7 +104,8 @@ namespace Stratus.Godot.Extensions
 
 		public static void Destroy(this Node instance)
 		{
-			instance.GetTree().CurrentScene.RemoveChild(instance);
+			instance.GetParent().RemoveChild(instance);		
+			//instance.GetTree().CurrentScene.RemoveChild(instance);
 			instance.QueueFree();
 		}
 

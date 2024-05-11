@@ -4,6 +4,8 @@ using Stratus.Events;
 using Stratus.Godot.Extensions;
 using Stratus.Inputs;
 
+using System;
+
 namespace Stratus.Godot.Inputs
 {
 	public partial class PlayerInput : Node
@@ -27,6 +29,11 @@ namespace Stratus.Godot.Inputs
 		public bool inputEnabled { get; set; } = true;
 
 		public double transitionDuration { get; set; } = 0.1;
+		public bool isKeyboard { get; private set; }
+		#endregion
+
+		#region Events
+		public event Action<int> onInputDeviceChanged;
 		#endregion
 
 		#region Messages
@@ -37,17 +44,18 @@ namespace Stratus.Godot.Inputs
 			EventSystem.Connect<ToggleInputEvent>(e =>
 			{
 				inputEnabled = e.toggle;
-
 			});
 
 			inputLayers.onPush += layer => this.Log($"PUSH <{layer}> ({inputLayers})");
 			inputLayers.onPop += layer => this.Log($"POP <{layer}> ({inputLayers})");
 			inputLayers.onQueue += layer => this.Log($"QUEUE <{layer}> ({inputLayers})");
-			this.Log("Ready");
 		}
 
 		public override void _UnhandledInput(InputEvent inputEvent)
 		{
+			// Keyboard/Mouse should be index 0
+			OnInputDeviceUsed(inputEvent.Device);
+
 			if (inputEnabled && hasInputLayer)
 			{
 				if (!layer.valid)
@@ -76,12 +84,29 @@ namespace Stratus.Godot.Inputs
 			inputLayers.TryPop(e.layer);
 		}
 
+		private void OnInputDeviceUsed(int index)
+		{
+			bool isKeyboard = index == 0;
+			if (this.isKeyboard == isKeyboard)
+			{
+				return;
+			}
+
+			this.isKeyboard = isKeyboard;
+			onInputDeviceChanged?.Invoke(index);
+		}
+
 		private void DisableInputTemporarily()
 		{
 			inputEnabled = false;
 			this.Invoke(() => inputEnabled = true, transitionDuration);
 
 		}
+		#endregion
+
+		#region Static Helpers
+		public static void ToggleInput(bool toggle) 
+			=> EventSystem.Broadcast(new ToggleInputEvent(toggle));
 		#endregion
 
 	}

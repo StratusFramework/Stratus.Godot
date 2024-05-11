@@ -1,8 +1,13 @@
 using Godot;
 
+using Prototypes.Stratus.Godot.UI;
+
 using Stratus.Collections;
+using Stratus.Events;
 using Stratus.Extensions;
 using Stratus.Godot.Extensions;
+using Stratus.Godot.Inputs;
+using Stratus.Inputs;
 using Stratus.Models.Actors;
 
 using System;
@@ -39,6 +44,8 @@ namespace Stratus.Godot.Actors
 		private Vector3 previousVelocity;
 		private Func<Vector3> getInput;
 		private bool receivedInput;
+
+		private InputActionPrompt inputPrompt = new InputActionPrompt("interact", "Interact");
 		#endregion
 
 		#region Properties
@@ -54,6 +61,9 @@ namespace Stratus.Godot.Actors
 		/// </summary>
 		/// <remarks>Reset whenever the interactives in range change</remarks>
 		public IArrayNavigator<Object3D> objectsInRange => _objectsInRange;
+		public bool canInteract => objectsInRange.valid;
+
+		private const float gravity = -10f;
 		#endregion
 
 		#region Messages
@@ -95,7 +105,8 @@ namespace Stratus.Godot.Actors
 			float delta_f = (float)delta;
 			float targetSpeed = sprint ? sprintMultiplier * speed : speed;
 			var newVelocity = Velocity.Lerp(direction.Value * targetSpeed, acceleration * delta_f);
-			newVelocity.Y = 0;
+			newVelocity.Y = gravity;
+
 			if (direction.Value.Length() == 0 && newVelocity.Length() < stoppingSpeed)
 			{
 				newVelocity = Vector3.Zero;
@@ -164,6 +175,8 @@ namespace Stratus.Godot.Actors
 				rig.Set(DefaultAnimation.Interact);
 				this.Log($"Interacting with {objectsInRange.current.name}");
 				objectsInRange.current.Interact(this);
+				// Disable input temporarily
+				PlayerInput.ToggleInput(false);
 			}
 		}
 		#endregion
@@ -234,7 +247,8 @@ namespace Stratus.Godot.Actors
 			var bodies = area.GetOverlappingBodies();
 			var objects = bodies.Select(b => b.GetParentOfType<Object3D>()).Where(o => o != null).ToArray();
 			_objectsInRange.Set(objects);
-			if (_objectsInRange.valid)
+			EventSystem.Broadcast(new ToggleInputPromptEvent(inputPrompt, canInteract));
+			if (canInteract)
 			{
 				this.Log($"Can interact with {_objectsInRange.values.ToStringJoin(",", StratusStringEnclosure.SquareBracket, o => o.name)}");
 			}
